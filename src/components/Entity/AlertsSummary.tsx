@@ -1,27 +1,16 @@
 import React, { FC } from 'react';
-import { Progress, StatusError, StatusOK, useApi } from '@backstage/core';
-import { IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, makeStyles, Menu, MenuItem, Tooltip, Typography } from '@material-ui/core';
-import Link from '@material-ui/core/Link';
+import { Progress, useApi } from '@backstage/core';
+import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, makeStyles, Typography } from '@material-ui/core';
 import { useAsync } from 'react-use';
 import { Alert as AlertUI } from '@material-ui/lab';
 import { Entity } from '@backstage/catalog-model';
 import moment from "moment";
-import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
-import OpenInNewIcon from '@material-ui/icons/OpenInNew';
-import VisibilityIcon from '@material-ui/icons/Visibility';
 
 import { opsgenieApiRef } from '../../api';
 import { Alert } from '../../types';
+import { AlertStatus, AlertActionsMenu } from '../Alert';
 
 const useStyles = makeStyles({
-    denseListIcon: {
-        marginRight: 0,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
     listItemPrimary: {
         fontWeight: 'bold',
     },
@@ -29,85 +18,6 @@ const useStyles = makeStyles({
         minWidth: '1em',
     },
 });
-
-const AlertActionsMenu = ({ alert }: { alert: Alert }) => {
-    const opsgenieApi = useApi(opsgenieApiRef);
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-
-    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
-
-    return (
-        <>
-            <IconButton
-                aria-label="more"
-                aria-controls="long-menu"
-                aria-haspopup="true"
-                onClick={handleClick}
-            >
-                <MoreVertIcon />
-            </IconButton>
-            <Menu
-                id={`actions-menu-${alert.id}`}
-                anchorEl={anchorEl}
-                keepMounted
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
-                PaperProps={{
-                    style: {maxHeight: 48 * 4.5,},
-                }}
-            >
-                {!alert.acknowledged && alert.status !== 'closed' &&
-                    (<MenuItem key="ack" onClick={handleClose}>
-                        <ListItemIcon>
-                            <VisibilityIcon fontSize="small" />
-                        </ListItemIcon>
-                        <Typography variant="inherit" noWrap>
-                            Acknowledge
-                        </Typography>
-                    </MenuItem>)
-                }
-
-                {alert.status !== 'closed' &&
-                    (<MenuItem key="close" onClick={handleClose}>
-                        <ListItemIcon>
-                            <CheckCircleIcon fontSize="small" />
-                        </ListItemIcon>
-                        <Typography variant="inherit" noWrap>
-                            Close
-                        </Typography>
-                    </MenuItem>)
-                }
-
-                <MenuItem key="details" onClick={handleClose}>
-                    <ListItemIcon>
-                        <OpenInNewIcon fontSize="small" />
-                    </ListItemIcon>
-                    <Typography variant="inherit" noWrap>
-                        <Link href={opsgenieApi.getAlertDetailsURL(alert)}>View in OpsGenie</Link>
-                    </Typography>
-                </MenuItem>
-            </Menu>
-        </>
-    );
-};
-
-const AlertStatus = ({ alert }: { alert: Alert }) => {
-    const classes = useStyles();
-
-    return (
-        <Tooltip title={alert.status} placement="top">
-            <div className={classes.denseListIcon}>
-                {alert.status === 'open' ? <StatusError /> : <StatusOK />}
-            </div>
-        </Tooltip>
-    );
-};
 
 const AlertListItem = ({ alert }: { alert: Alert }) => {
     const classes = useStyles();

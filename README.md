@@ -10,6 +10,20 @@ Welcome to the opsgenie plugin!
 yarn add @k-phoen/backstage-plugin-opsgenie
 ```
 
+2. Configure the plugin:
+
+```yaml
+
+proxy:
+  '/opsgenie/api':
+    target: https://api.eu.opsgenie.com
+    headers:
+      Authorization: GenieKey [[ API KEY here ]]
+
+opsgenie:
+  domain: https://my-app.app.eu.opsgenie.com/
+```
+
 3. Add plugin to the list of plugins:
 
 ```ts

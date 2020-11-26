@@ -1,0 +1,15 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: backstage-plugin-opsgenie
+  description: |
+    Backstage plugin to integrate OpsGenie.
+  annotations:
+    github.com/project-slug: K-Phoen/backstage-plugin-opsgenie
+  tags:
+    - plugin
+    - oss
+spec:
+  type: library
+  owner: user:K-Phoen
+  lifecycle: experimental

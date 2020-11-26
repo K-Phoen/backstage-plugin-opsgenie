@@ -1,4 +1,4 @@
-import { createApiFactory, createPlugin, createRouteRef, discoveryApiRef } from '@backstage/core';
+import { configApiRef, createApiFactory, createPlugin, createRouteRef, discoveryApiRef } from '@backstage/core';
 import { OpsGenieApi, opsgenieApiRef } from './api';
 
 export const rootRouteRef = createRouteRef({
@@ -11,8 +11,14 @@ export const plugin = createPlugin({
   apis: [
     createApiFactory({
       api: opsgenieApiRef,
-      deps: { discoveryApi: discoveryApiRef },
-      factory: ({ discoveryApi }) => new OpsGenieApi({ discoveryApi: discoveryApi }),
+      deps: { discoveryApi: discoveryApiRef, configApi: configApiRef },
+      factory: ({ discoveryApi, configApi }) => {
+        return new OpsGenieApi({
+          discoveryApi: discoveryApi,
+          domain: configApi.getString('opsgenie.domain'),
+          proxyPath: configApi.getOptionalString('opsgenie.proxyPath'),
+        });
+      },
     }),
   ],
 });

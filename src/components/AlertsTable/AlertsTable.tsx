@@ -1,25 +1,69 @@
 import React, { FC } from 'react';
-import { Table, TableColumn } from '@backstage/core';
-import { Alert } from '../../types';
+import { Table, TableColumn, useApi } from '@backstage/core';
 import { Chip } from '@material-ui/core';
-
+import Link from '@material-ui/core/Link';
+import { AlertActionsMenu } from '../Alert/AlertActionsMenu';
+import { opsgenieApiRef } from '../../api';
+import { Alert } from '../../types';
 
 export const AlertsTable: FC<{alerts: Alert[]}> = ({ alerts }) => {
+    const opsgenieApi = useApi(opsgenieApiRef);
+    const smallColumnStyle = {
+        width: '5%',
+        maxWidth: '5%',
+    };
+    const mediumColumnStyle = {
+        width: '10%',
+        maxWidth: '10%',
+    };
+
     const columns: TableColumn[] = [
         {
             title: 'ID',
             field: 'tinyId',
             highlight: true,
+            cellStyle: smallColumnStyle,
+            headerStyle: smallColumnStyle,
+            render: rowData => <Link href={opsgenieApi.getAlertDetailsURL(rowData as Alert)}>#{(rowData as Alert).tinyId}</Link>
         },
-        { title: 'Message', field: 'message' },
-        { title: 'Status', field: 'status' },
-        { title: 'Acknowledged', field: 'acknowledged', type: 'boolean' },
+        {
+            title: 'Status',
+            field: 'status',
+            cellStyle: smallColumnStyle,
+            headerStyle: smallColumnStyle,
+            render: rowData => <Chip label={(rowData as Alert).status} color={(rowData as Alert).status === 'open' ? 'secondary' : 'default'} size="small" />
+        },
+        {
+            title: 'Alert',
+            field: 'message',
+        },
+        {
+            title: 'Acknowledged',
+            field: 'acknowledged',
+            type: 'boolean',
+            cellStyle: smallColumnStyle,
+            headerStyle: smallColumnStyle,
+        },
         {
             title: 'Tags',
             field: 'tags',
-            render: rowData => <>{(rowData as Alert).tags.map((tag) => <Chip label={tag} />)}</>
+            render: rowData => <>{(rowData as Alert).tags.map((tag) => <Chip label={tag} size="small" />)}</>
         },
-        { title: 'Updated At', field: 'updatedAt', type: 'datetime', dateSetting: {locale: 'en-UK'} },
+        {
+            title: 'Updated At',
+            field: 'updatedAt',
+            type: 'datetime',
+            dateSetting: {locale: 'en-UK'},
+            cellStyle: mediumColumnStyle,
+            headerStyle: mediumColumnStyle,
+        },
+        {
+            title: 'Actions',
+            field: '',
+            cellStyle: smallColumnStyle,
+            headerStyle: smallColumnStyle,
+            render: rowData => <AlertActionsMenu alert={rowData as Alert} />
+        },
     ];
 
     return (
@@ -31,6 +75,7 @@ export const AlertsTable: FC<{alerts: Alert[]}> = ({ alerts }) => {
                 actionsColumnIndex: -1,
                 pageSize: 25,
                 pageSizeOptions: [25, 50, 100, 150, 200],
+                padding: 'dense',
             }}
             localization={{ header: { actions: undefined } }}
             columns={columns}

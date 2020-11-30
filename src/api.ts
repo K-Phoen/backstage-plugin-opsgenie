@@ -17,6 +17,9 @@ export interface OpsGenie {
 
   getAlertsForEntity(entity: Entity, opts?: AlertsFetchOpts): Promise<Alert[]>;
   getAlertDetailsURL(alert: Alert): string;
+
+  acknowledgeAlert(alert: Alert): Promise<void>;
+  closeAlert(alert: Alert): Promise<void>;
 }
 
 interface AlertsResponse {
@@ -65,6 +68,13 @@ export class OpsGenieApi implements OpsGenie {
     return await resp.json();
   }
 
+  private async call(input: string, init?: RequestInit): Promise<void> {
+    const apiUrl = await this.apiUrl();
+
+    const resp = await fetch(`${apiUrl}${input}`, init);
+    if (!resp.ok) throw new Error(`Request failed with ${resp.status}: ${resp.statusText}`);
+  }
+
   async getAlerts(opts?: AlertsFetchOpts): Promise<Alert[]> {
     const limit = opts?.limit || 50;
 
@@ -79,6 +89,22 @@ export class OpsGenieApi implements OpsGenie {
     const response = await this.fetch<AlertsResponse>(`/v2/alerts?limit=${limit}&query=tag:"service:${entity.metadata.name}"`);
 
     return response.data;
+  }
+
+  async acknowledgeAlert(alert: Alert): Promise<void> {
+    await this.call(`/v2/alerts/${alert.id}/acknowledge`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({source: 'Backstage — OpsGenie plugin'}),
+    })
+  }
+
+  async closeAlert(alert: Alert): Promise<void> {
+    await this.call(`/v2/alerts/${alert.id}/close`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({source: 'Backstage — OpsGenie plugin'}),
+    })
   }
 
   getAlertDetailsURL(alert: Alert): string {

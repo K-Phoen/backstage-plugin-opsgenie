@@ -1,5 +1,5 @@
 import React from 'react';
-import { useApi } from '@backstage/core';
+import { alertApiRef, useApi } from '@backstage/core';
 import { IconButton, ListItemIcon, Menu, MenuItem, Typography } from '@material-ui/core';
 import Link from '@material-ui/core/Link';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
@@ -13,14 +13,35 @@ import { Alert } from '../../types';
 
 export const AlertActionsMenu = ({ alert }: { alert: Alert }) => {
     const opsgenieApi = useApi(opsgenieApiRef);
+    const alertApi = useApi(alertApiRef);
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
     };
 
-    const handleClose = () => {
+    const handleCloseMenu = () => {
         setAnchorEl(null);
+    };
+
+    const handleAcknowledge = async (): Promise<void> => {
+        try {
+            await opsgenieApi.acknowledgeAlert(alert);
+            handleCloseMenu();
+            alertApi.post({message: 'Alert acknowledged.'});
+        } catch (err) {
+            alertApi.post({message: err, severity: 'error'});
+        }
+    };
+
+    const handleCloseAlert = async (): Promise<void> => {
+        try {
+            await opsgenieApi.closeAlert(alert);
+            handleCloseMenu();
+            alertApi.post({message: 'Alert closed.'});
+        } catch (err) {
+            alertApi.post({message: err, severity: 'error'});
+        }
     };
 
     return (
@@ -38,13 +59,13 @@ export const AlertActionsMenu = ({ alert }: { alert: Alert }) => {
                 anchorEl={anchorEl}
                 keepMounted
                 open={Boolean(anchorEl)}
-                onClose={handleClose}
+                onClose={handleCloseMenu}
                 PaperProps={{
                     style: {maxHeight: 48 * 4.5,},
                 }}
             >
                 {!alert.acknowledged && alert.status !== 'closed' &&
-                    (<MenuItem key="ack" onClick={handleClose}>
+                    (<MenuItem key="ack" onClick={handleAcknowledge}>
                         <ListItemIcon>
                             <VisibilityIcon fontSize="small" />
                         </ListItemIcon>
@@ -55,7 +76,7 @@ export const AlertActionsMenu = ({ alert }: { alert: Alert }) => {
                 }
 
                 {alert.status !== 'closed' &&
-                    (<MenuItem key="close" onClick={handleClose}>
+                    (<MenuItem key="close" onClick={handleCloseAlert}>
                         <ListItemIcon>
                             <CheckCircleIcon fontSize="small" />
                         </ListItemIcon>
@@ -65,7 +86,7 @@ export const AlertActionsMenu = ({ alert }: { alert: Alert }) => {
                     </MenuItem>)
                 }
 
-                <MenuItem key="details" onClick={handleClose}>
+                <MenuItem key="details" onClick={handleCloseMenu}>
                     <ListItemIcon>
                         <OpenInNewIcon fontSize="small" />
                     </ListItemIcon>

@@ -1,10 +1,10 @@
 # OpsGenie plugin for Backstage
 
-Welcome to the opsgenie plugin!
+Welcome to the OpsGenie plugin!
 
 ## Plugin Setup
 
-1. If you have standalone app (you didn't clone this repo), then do
+1. If you have standalone app (you didn't clone this repository), then do:
 
 ```bash
 yarn add @k-phoen/backstage-plugin-opsgenie
@@ -24,7 +24,7 @@ opsgenie:
   domain: https://my-app.app.eu.opsgenie.com/
 ```
 
-3. Add plugin to the list of plugins:
+3. Add the plugin to the list of plugins:
 
 ```ts
 // packages/app/src/plugins.ts

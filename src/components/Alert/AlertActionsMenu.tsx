@@ -11,10 +11,11 @@ import { opsgenieApiRef } from '../../api';
 import { Alert } from '../../types';
 
 
-export const AlertActionsMenu = ({ alert }: { alert: Alert }) => {
+export const AlertActionsMenu = ({ alert, onAlertChanged }: { alert: Alert, onAlertChanged?: (alert: Alert) => void }) => {
     const opsgenieApi = useApi(opsgenieApiRef);
     const alertApi = useApi(alertApiRef);
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const callback = onAlertChanged || ((_: Alert): void => {});
 
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -29,6 +30,9 @@ export const AlertActionsMenu = ({ alert }: { alert: Alert }) => {
             await opsgenieApi.acknowledgeAlert(alert);
             handleCloseMenu();
             alertApi.post({message: 'Alert acknowledged.'});
+
+            alert.acknowledged = true;
+            callback(alert);
         } catch (err) {
             alertApi.post({message: err, severity: 'error'});
         }
@@ -39,6 +43,9 @@ export const AlertActionsMenu = ({ alert }: { alert: Alert }) => {
             await opsgenieApi.closeAlert(alert);
             handleCloseMenu();
             alertApi.post({message: 'Alert closed.'});
+
+            alert.status = 'closed';
+            callback(alert);
         } catch (err) {
             alertApi.post({message: err, severity: 'error'});
         }

@@ -9,7 +9,7 @@ import { IncidentsTable } from './IncidentsTable';
 export const IncidentsList: FC<{}> = () => {
     const opsgenieApi = useApi(opsgenieApiRef);
 
-    const {value, loading, error } = useAsync(async () => await opsgenieApi.getIncidents());
+    const {value, loading, error} = useAsync(async () => await opsgenieApi.getIncidents());
 
     if (loading) {
         return <Progress />;

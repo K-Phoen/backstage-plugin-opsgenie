@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import { Table, TableColumn, useApi } from '@backstage/core';
 import { Chip } from '@material-ui/core';
 import Link from '@material-ui/core/Link';
@@ -15,6 +15,18 @@ export const AlertsTable: FC<{alerts: Alert[]}> = ({ alerts }) => {
     const mediumColumnStyle = {
         width: '10%',
         maxWidth: '10%',
+    };
+
+    const [alertsList, setAlertsList] = useState(alerts);
+
+    const onAlertChanged = (newAlert: Alert) => {
+        setAlertsList(alertsList.map((alert: Alert): Alert => {
+            if (newAlert.id === alert.id) {
+                return newAlert;
+            }
+
+            return alert;
+        }));
     };
 
     const columns: TableColumn[] = [
@@ -62,7 +74,7 @@ export const AlertsTable: FC<{alerts: Alert[]}> = ({ alerts }) => {
             field: '',
             cellStyle: smallColumnStyle,
             headerStyle: smallColumnStyle,
-            render: rowData => <AlertActionsMenu alert={rowData as Alert} />
+            render: rowData => <AlertActionsMenu alert={rowData as Alert} onAlertChanged={onAlertChanged} />
         },
     ];
 
@@ -79,7 +91,7 @@ export const AlertsTable: FC<{alerts: Alert[]}> = ({ alerts }) => {
             }}
             localization={{ header: { actions: undefined } }}
             columns={columns}
-            data={alerts}
+            data={alertsList}
         />
     );
 };

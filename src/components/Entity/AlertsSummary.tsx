@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import { Progress, useApi } from '@backstage/core';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, makeStyles, Typography } from '@material-ui/core';
 import { useAsync } from 'react-use';
@@ -21,27 +21,34 @@ const useStyles = makeStyles({
 
 const AlertListItem = ({ alert }: { alert: Alert }) => {
     const classes = useStyles();
-    const createdAt = moment(alert.createdAt).fromNow();
+    const [alertState, setAlertState] = useState({data: alert, updatedAt: alert.updatedAt});
+
+    const onAlertChanged = (newAlert: Alert) => {
+        setAlertState({
+            data: newAlert,
+            updatedAt: (new Date()).toISOString(),
+        });
+    };
 
     return (
-        <ListItem dense key={alert.id}>
+        <ListItem dense key={alertState.data.id}>
             <ListItemIcon className={classes.listItemIcon}>
-                <AlertStatus alert={alert} />
+                <AlertStatus alert={alertState.data} />
             </ListItemIcon>
             <ListItemText
-                primary={alert.message}
+                primary={alertState.data.message}
                 primaryTypographyProps={{
                     variant: 'body1',
                     className: classes.listItemPrimary,
                 }}
                 secondary={
                     <Typography noWrap variant="body2" color="textSecondary">
-                        Created {createdAt}
+                        Created {moment(alertState.data.createdAt).fromNow()}
                     </Typography>
                 }
             />
             <ListItemSecondaryAction>
-                <AlertActionsMenu alert={alert} />
+                <AlertActionsMenu alert={alertState.data} onAlertChanged={onAlertChanged} />
             </ListItemSecondaryAction>
         </ListItem>
     );

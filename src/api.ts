@@ -1,7 +1,7 @@
 import { Entity } from '@backstage/catalog-model';
 import { createApiRef, DiscoveryApi } from '@backstage/core';
 
-import { Alert } from './types';
+import { Alert, Incident } from './types';
 
 export const opsgenieApiRef = createApiRef<OpsGenie>({
   id: 'plugin.opsgenie.service',
@@ -12,18 +12,29 @@ type AlertsFetchOpts = {
   limit?: number
 }
 
+type IncidentsFetchOpts = {
+  limit?: number
+}
+
 export interface OpsGenie {
   getAlerts(opts?: AlertsFetchOpts): Promise<Alert[]>;
+  getIncidents(opts?: IncidentsFetchOpts): Promise<Incident[]>;
 
   getAlertsForEntity(entity: Entity, opts?: AlertsFetchOpts): Promise<Alert[]>;
   getAlertDetailsURL(alert: Alert): string;
 
   acknowledgeAlert(alert: Alert): Promise<void>;
   closeAlert(alert: Alert): Promise<void>;
+
+  getIncidentDetailsURL(incident: Incident): string;
 }
 
 interface AlertsResponse {
   data: Alert[];
+}
+
+interface IncidentsResponse {
+  data: Incident[];
 }
 
 const DEFAULT_PROXY_PATH = '/opsgenie/api';
@@ -83,6 +94,14 @@ export class OpsGenieApi implements OpsGenie {
     return response.data;
   }
 
+  async getIncidents(opts?: AlertsFetchOpts): Promise<Incident[]> {
+    const limit = opts?.limit || 50;
+
+    const response = await this.fetch<IncidentsResponse>(`/v1/incidents?limit=${limit}`);
+
+    return response.data;
+  }
+
   async getAlertsForEntity(entity: Entity, opts?: AlertsFetchOpts): Promise<Alert[]> {
     const limit = opts?.limit || 5;
 
@@ -109,6 +128,10 @@ export class OpsGenieApi implements OpsGenie {
 
   getAlertDetailsURL(alert: Alert): string {
     return `${this.domain}/alert/detail/${alert.id}/details`;
+  }
+
+  getIncidentDetailsURL(incident: Incident): string {
+    return `${this.domain}/incident/detail/${incident.id}`;
   }
 
   private async apiUrl() {

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, Divider } from '@material-ui/core';
 import { Entity } from '@backstage/catalog-model';
 import { AlertsSummary } from './AlertsSummary';
@@ -9,7 +9,7 @@ type AlertsCardProps = {
     title?: string;
 };
 
-export const AlertsCard: FC<AlertsCardProps> = ({ entity, title }) => {
+export const AlertsCard = ({ entity, title }: AlertsCardProps) => {
     return (
         <Card>
             <CardHeader title={title || "OpsGenie — Alerts"} />

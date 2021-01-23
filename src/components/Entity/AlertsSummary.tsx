@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { useState } from 'react';
 import { Progress, useApi } from '@backstage/core';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, makeStyles, Typography } from '@material-ui/core';
 import { useAsync } from 'react-use';
@@ -54,7 +54,7 @@ const AlertListItem = ({ alert }: { alert: Alert }) => {
     );
 };
 
-const AlertsSummaryTable: FC<{ alerts: Alert[] }> = ({ alerts }) => {
+const AlertsSummaryTable = ({ alerts }: { alerts: Alert[] }) => {
     return (
         <List dense>
             {alerts.map((alert, index) => (<AlertListItem key={alert.id + index} alert={alert} />))}
@@ -63,7 +63,7 @@ const AlertsSummaryTable: FC<{ alerts: Alert[] }> = ({ alerts }) => {
     );
 };
 
-export const AlertsSummary: FC<{ entity: Entity }> = ({ entity }) => {
+export const AlertsSummary = ({ entity }: { entity: Entity }) => {
     const opsgenieApi = useApi(opsgenieApiRef);
 
     const { value, loading, error } = useAsync(async () => await opsgenieApi.getAlertsForEntity(entity, {limit: 3}));

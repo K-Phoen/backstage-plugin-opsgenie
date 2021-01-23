@@ -4,4 +4,5 @@ export * from './components/MainPage';
 export * from './components/AlertsTable';
 export * from './components/IncidentsTable';
 export * from './components/Entity';
+export * from './integration';
 export * from './Router';

@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { useState } from 'react';
 import { Table, TableColumn, useApi } from '@backstage/core';
 import { Chip } from '@material-ui/core';
 import Link from '@material-ui/core/Link';
@@ -6,7 +6,7 @@ import { AlertActionsMenu } from '../Alert/AlertActionsMenu';
 import { opsgenieApiRef } from '../../api';
 import { Alert } from '../../types';
 
-export const AlertsTable: FC<{alerts: Alert[]}> = ({ alerts }) => {
+export const AlertsTable = ({ alerts }: {alerts: Alert[]}) => {
     const opsgenieApi = useApi(opsgenieApiRef);
     const smallColumnStyle = {
         width: '5%',

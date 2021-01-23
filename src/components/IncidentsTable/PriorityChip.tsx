@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React from 'react';
 import { Chip, withStyles } from '@material-ui/core';
 import { Incident } from '../../types';
 
@@ -41,7 +41,7 @@ const priorityLabels = {
     'P1': 'Critical',
 } as Record<string, string>;
 
-export const PriorityChip: FC<{incident: Incident}> = ({ incident }) => {
+export const PriorityChip = ({ incident }: {incident: Incident}) => {
     const label = `${incident.priority} — ${priorityLabels[incident.priority]}`;
 
     switch (incident.priority) {

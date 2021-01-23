@@ -1,4 +1,4 @@
-import React, {FC} from 'react';
+import React from 'react';
 import {opsgenieApiRef} from '../../api';
 import {useApi, Progress} from "@backstage/core";
 import {useAsync} from "react-use";
@@ -6,7 +6,7 @@ import Alert from "@material-ui/lab/Alert";
 import { AlertsTable } from './AlertsTable';
 
 
-export const AlertsList: FC<{}> = () => {
+export const AlertsList = () => {
     const opsgenieApi = useApi(opsgenieApiRef);
 
     const {value, loading, error } = useAsync(async () => await opsgenieApi.getAlerts());

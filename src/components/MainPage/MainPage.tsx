@@ -1,10 +1,10 @@
-import React, { FC } from 'react';
+import React from 'react';
 import { Page, Header, Content, Tabs } from "@backstage/core";
 import { AlertsList } from '../AlertsTable';
 import { IncidentsList } from '../IncidentsTable';
 
 
-const MainPage: FC<{}> = () => {
+const MainPage = () => {
     return (
         <Page themeId="tool">
             <Header title="OpsGenie" type="tool" />

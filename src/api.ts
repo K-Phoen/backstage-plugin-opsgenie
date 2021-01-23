@@ -1,5 +1,6 @@
 import { Entity } from '@backstage/catalog-model';
 import { createApiRef, DiscoveryApi } from '@backstage/core';
+import { OPSGENIE_ANNOTATION } from './integration';
 
 import { Alert, Incident } from './types';
 
@@ -104,8 +105,9 @@ export class OpsGenieApi implements OpsGenie {
 
   async getAlertsForEntity(entity: Entity, opts?: AlertsFetchOpts): Promise<Alert[]> {
     const limit = opts?.limit || 5;
+    const query = entity.metadata.annotations?.[OPSGENIE_ANNOTATION];
 
-    const response = await this.fetch<AlertsResponse>(`/v2/alerts?limit=${limit}&query=tag:"service:${entity.metadata.name}"`);
+    const response = await this.fetch<AlertsResponse>(`/v2/alerts?limit=${limit}&query=${query}`);
 
     return response.data;
   }

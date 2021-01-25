@@ -98,7 +98,7 @@ export const AlertActionsMenu = ({ alert, onAlertChanged }: { alert: Alert, onAl
                         <OpenInNewIcon fontSize="small" />
                     </ListItemIcon>
                     <Typography variant="inherit" noWrap>
-                        <Link href={opsgenieApi.getAlertDetailsURL(alert)}>View in OpsGenie</Link>
+                        <Link href={opsgenieApi.getAlertDetailsURL(alert)}>View in Opsgenie</Link>
                     </Typography>
                 </MenuItem>
             </Menu>

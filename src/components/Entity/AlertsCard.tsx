@@ -12,7 +12,7 @@ type AlertsCardProps = {
 export const AlertsCard = ({ entity, title }: AlertsCardProps) => {
     return (
         <Card>
-            <CardHeader title={title || "OpsGenie — Alerts"} />
+            <CardHeader title={title || "Opsgenie — Alerts"} />
             <Divider />
             <CardContent>
                 <AlertsSummary entity={entity} />

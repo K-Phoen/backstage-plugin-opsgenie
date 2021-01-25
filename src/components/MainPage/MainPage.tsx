@@ -7,7 +7,7 @@ import { IncidentsList } from '../IncidentsTable';
 const MainPage = () => {
     return (
         <Page themeId="tool">
-            <Header title="OpsGenie" type="tool" />
+            <Header title="Opsgenie" type="tool" />
 
             <Content>
                 <Tabs

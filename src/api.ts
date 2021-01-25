@@ -4,9 +4,9 @@ import { OPSGENIE_ANNOTATION } from './integration';
 
 import { Alert, Incident } from './types';
 
-export const opsgenieApiRef = createApiRef<OpsGenie>({
+export const opsgenieApiRef = createApiRef<Opsgenie>({
   id: 'plugin.opsgenie.service',
-  description: 'Used to make requests towards OpsGenie API',
+  description: 'Used to make requests towards Opsgenie API',
 });
 
 type AlertsFetchOpts = {
@@ -17,7 +17,7 @@ type IncidentsFetchOpts = {
   limit?: number
 }
 
-export interface OpsGenie {
+export interface Opsgenie {
   getAlerts(opts?: AlertsFetchOpts): Promise<Alert[]>;
   getIncidents(opts?: IncidentsFetchOpts): Promise<Incident[]>;
 
@@ -44,7 +44,7 @@ type Options = {
   discoveryApi: DiscoveryApi;
 
   /**
-   * Domain used by users to access OpsGenie web UI.
+   * Domain used by users to access Opsgenie web UI.
    * Example: https://my-app.app.eu.opsgenie.com/
    */
   domain: string;
@@ -56,9 +56,9 @@ type Options = {
 };
 
 /**
- * API to talk to OpsGenie.
+ * API to talk to Opsgenie.
  */
-export class OpsGenieApi implements OpsGenie {
+export class OpsgenieApi implements Opsgenie {
   private readonly discoveryApi: DiscoveryApi;
   private readonly proxyPath: string;
   private readonly domain: string;
@@ -116,7 +116,7 @@ export class OpsGenieApi implements OpsGenie {
     await this.call(`/v2/alerts/${alert.id}/acknowledge`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({source: 'Backstage — OpsGenie plugin'}),
+      body: JSON.stringify({source: 'Backstage — Opsgenie plugin'}),
     })
   }
 
@@ -124,7 +124,7 @@ export class OpsGenieApi implements OpsGenie {
     await this.call(`/v2/alerts/${alert.id}/close`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({source: 'Backstage — OpsGenie plugin'}),
+      body: JSON.stringify({source: 'Backstage — Opsgenie plugin'}),
     })
   }
 

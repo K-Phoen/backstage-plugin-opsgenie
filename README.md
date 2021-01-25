@@ -46,14 +46,14 @@ export { plugin as PluginOpsgenie } from '@k-phoen/backstage-plugin-opsgenie';
 
 ```ts
 // packages/app/src/App.tsx
-import { Router as OpsGenieRouter } from '@k-phoen/backstage-plugin-opsgenie';
+import { Router as OpsgenieRouter } from '@k-phoen/backstage-plugin-opsgenie';
 
 // ...
 
 const AppRoutes = () => (
   <Routes>
     /// ...
-    <Route path="/opsgenie/*" element={<OpsGenieRouter />} />
+    <Route path="/opsgenie/*" element={<OpsgenieRouter />} />
     // ...
   </Routes>
 );
@@ -63,16 +63,15 @@ const AppRoutes = () => (
 
 ```ts
 import {
-  AlertsCard as OpsGenieAlertsCard,
-  isPluginApplicableToEntity as isOpsGenieAvailable
+  AlertsCard as OpsgenieAlertsCard,
+  isPluginApplicableToEntity as isOpsgenieAvailable
 } from '@k-phoen/backstage-plugin-opsgenie';
 
-// add to code
-
+// add wherever you want to display the alerts card:
 {
-  isOpsGenieAvailable(entity) && (
+  isOpsgenieAvailable(entity) && (
     <Grid item>
-      <OpsGenieAlertsCard entity={entity} />
+      <OpsgenieAlertsCard entity={entity} />
     </Grid>
   );
 }

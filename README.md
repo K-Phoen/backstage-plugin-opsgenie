@@ -33,7 +33,7 @@ opsgenie:
   domain: https://my-app.app.eu.opsgenie.com/
 ```
 
-**Note:** this plugin requires an API key issued from an integration. They can be retrieved frim the "Settings" tab and then "Integrations" tab.
+**Note:** this plugin requires an API key issued from an integration. They can be retrieved from the "Settings" tab and then "Integrations" tab.
 
 3. Add the plugin to the list of plugins:
 

@@ -1,6 +1,6 @@
-# OpsGenie plugin for Backstage
+# Opsgenie plugin for Backstage
 
-Welcome to the OpsGenie plugin!
+Welcome to the Opsgenie plugin!
 
 Alerts page:
 ![Opsgenie alerts page](./docs/opsgenie-alerts-page.png)

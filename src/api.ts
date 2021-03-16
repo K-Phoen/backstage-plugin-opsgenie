@@ -1,5 +1,5 @@
 import { Entity } from '@backstage/catalog-model';
-import { createApiRef, DiscoveryApi } from '@backstage/core';
+import { createApiRef, DiscoveryApi, IdentityApi } from '@backstage/core';
 import { OPSGENIE_ANNOTATION } from './integration';
 
 import { Alert, Incident } from './types';
@@ -42,6 +42,7 @@ const DEFAULT_PROXY_PATH = '/opsgenie/api';
 
 type Options = {
   discoveryApi: DiscoveryApi;
+  identityApi: IdentityApi;
 
   /**
    * Domain used by users to access Opsgenie web UI.
@@ -60,11 +61,13 @@ type Options = {
  */
 export class OpsgenieApi implements Opsgenie {
   private readonly discoveryApi: DiscoveryApi;
+  private readonly identityApi: IdentityApi;
   private readonly proxyPath: string;
   private readonly domain: string;
 
   constructor(opts: Options) {
     this.discoveryApi = opts.discoveryApi;
+    this.identityApi = opts.identityApi;
     this.domain = opts.domain;
     this.proxyPath = opts.proxyPath ?? DEFAULT_PROXY_PATH;
   }
@@ -89,16 +92,18 @@ export class OpsgenieApi implements Opsgenie {
 
   async getAlerts(opts?: AlertsFetchOpts): Promise<Alert[]> {
     const limit = opts?.limit || 50;
+    const init = await this.addAuthHeaders({});
 
-    const response = await this.fetch<AlertsResponse>(`/v2/alerts?limit=${limit}`);
+    const response = await this.fetch<AlertsResponse>(`/v2/alerts?limit=${limit}`, init);
 
     return response.data;
   }
 
   async getIncidents(opts?: AlertsFetchOpts): Promise<Incident[]> {
     const limit = opts?.limit || 50;
+    const init = await this.addAuthHeaders({});
 
-    const response = await this.fetch<IncidentsResponse>(`/v1/incidents?limit=${limit}`);
+    const response = await this.fetch<IncidentsResponse>(`/v1/incidents?limit=${limit}`, init);
 
     return response.data;
   }
@@ -106,26 +111,31 @@ export class OpsgenieApi implements Opsgenie {
   async getAlertsForEntity(entity: Entity, opts?: AlertsFetchOpts): Promise<Alert[]> {
     const limit = opts?.limit || 5;
     const query = entity.metadata.annotations?.[OPSGENIE_ANNOTATION];
+    const init = await this.addAuthHeaders({});
 
-    const response = await this.fetch<AlertsResponse>(`/v2/alerts?limit=${limit}&query=${query}`);
+    const response = await this.fetch<AlertsResponse>(`/v2/alerts?limit=${limit}&query=${query}`, init);
 
     return response.data;
   }
 
   async acknowledgeAlert(alert: Alert): Promise<void> {
-    await this.call(`/v2/alerts/${alert.id}/acknowledge`, {
+    const init = await this.addAuthHeaders({
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({source: 'Backstage — Opsgenie plugin'}),
-    })
+    });
+
+    await this.call(`/v2/alerts/${alert.id}/acknowledge`, init);
   }
 
   async closeAlert(alert: Alert): Promise<void> {
-    await this.call(`/v2/alerts/${alert.id}/close`, {
+    const init = await this.addAuthHeaders({
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({source: 'Backstage — Opsgenie plugin'}),
-    })
+    });
+
+    await this.call(`/v2/alerts/${alert.id}/close`, init);
   }
 
   getAlertDetailsURL(alert: Alert): string {
@@ -139,5 +149,18 @@ export class OpsgenieApi implements Opsgenie {
   private async apiUrl() {
     const proxyUrl = await this.discoveryApi.getBaseUrl('proxy');
     return proxyUrl + this.proxyPath;
+  }
+
+  private async addAuthHeaders(init: RequestInit): Promise<RequestInit> {
+    const authToken = await this.identityApi.getIdToken();
+    const headers = init.headers || {};
+
+    return {
+      ...init,
+      headers: {
+        ...headers,
+        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+      }
+    };
   }
 }

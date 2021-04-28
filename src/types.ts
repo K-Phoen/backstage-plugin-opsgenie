@@ -21,3 +21,21 @@ export interface Incident {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface TeamRef {
+  id: string; // UUID
+  name: string;
+}
+
+export interface OnCallParticipantRef {
+  id: string; // UUID
+  name: string;
+  type: string; // user, team, escalation, schedule
+}
+
+export interface Schedule {
+  id: string; // UUID
+  name: string; // ScheduleName
+  enabled: boolean;
+  ownerTeam: TeamRef;
+}

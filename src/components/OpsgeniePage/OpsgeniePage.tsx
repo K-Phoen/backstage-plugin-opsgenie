@@ -4,7 +4,7 @@ import { AlertsList } from '../AlertsTable';
 import { IncidentsList } from '../IncidentsTable';
 import { OnCallList } from '../OnCallList';
 
-const MainPage = () => {
+export const OpsgeniePage = () => {
     return (
         <Page themeId="tool">
             <Header title="Opsgenie" type="tool" />
@@ -30,5 +30,3 @@ const MainPage = () => {
         </Page>
     );
 };
-
-export default MainPage;

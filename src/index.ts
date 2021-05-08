@@ -1,8 +1,4 @@
-export { plugin } from './plugin';
+export * from './extensions';
+export { opsGeniePlugin } from './plugin';
 export * from './api';
-export * from './components/MainPage';
-export * from './components/AlertsTable';
-export * from './components/IncidentsTable';
-export * from './components/Entity';
 export * from './integration';
-export * from './Router';

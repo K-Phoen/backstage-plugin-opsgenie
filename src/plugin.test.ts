@@ -1,7 +1,7 @@
-import { plugin } from './plugin';
+import { opsGeniePlugin } from './plugin';
 
 describe('plugin-opsgenie', () => {
   it('should export plugin', () => {
-    expect(plugin).toBeDefined();
+    expect(opsGeniePlugin).toBeDefined();
   });
 });

@@ -35,49 +35,40 @@ opsgenie:
 
 **Note:** this plugin requires an API key issued from an integration. They can be retrieved from the "Settings" tab and then "Integrations" tab.
 
-3. Add the plugin to the list of plugins:
-
-```ts
-// packages/app/src/plugins.ts
-export { plugin as PluginOpsgenie } from '@k-phoen/backstage-plugin-opsgenie';
-```
-
-4. Expose the plugin to your Backstage instance:
+3. Expose the plugin to your Backstage instance:
 
 ```ts
 // packages/app/src/App.tsx
-import { Router as OpsgenieRouter } from '@k-phoen/backstage-plugin-opsgenie';
+import { OpsgeniePage } from '@k-phoen/backstage-plugin-opsgenie';
 
 // ...
 
 const AppRoutes = () => (
-  <Routes>
+  <FlatRoutes>
     /// ...
-    <Route path="/opsgenie/*" element={<OpsgenieRouter />} />
+    <Route path="/opsgenie" element={<OpsgeniePage />} />
     // ...
-  </Routes>
+  </FlatRoutes>
 );
 ```
 
-5. Add it to the `EntityPage.ts`:
+4. Add it to the `EntityPage.ts`:
 
 ```ts
 import {
-  AlertsCard as OpsgenieAlertsCard,
-  isPluginApplicableToEntity as isOpsgenieAvailable
+  EntityOpsgenieAlertsCard,
+  isOpsgenieAvailable
 } from '@k-phoen/backstage-plugin-opsgenie';
 
 // add wherever you want to display the alerts card:
-{
-  isOpsgenieAvailable(entity) && (
-    <Grid item>
-      <OpsgenieAlertsCard entity={entity} />
-    </Grid>
-  );
-}
+<EntitySwitch>
+  <EntitySwitch.Case if={isOpsgenieAvailable}>
+    <EntityOpsgenieAlertsCard />
+  </EntitySwitch.Case>
+</EntitySwitch>
 ```
 
-6. Run backstage app with `yarn start` and navigate to services tabs.
+5. Run backstage app with `yarn start` and navigate to services tabs.
 
 
 ## Components annotations

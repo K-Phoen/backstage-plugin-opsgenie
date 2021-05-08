@@ -47,7 +47,7 @@ const OnCallForScheduleCard = ({ schedule }: { schedule: Schedule }) => {
 
     return (
         <Card>
-            <CardHeader title={title} titleTypographyProps={{variant: 'h6'}}></CardHeader>
+            <CardHeader title={title} titleTypographyProps={{variant: 'h6'}} />
 
             <CardContent>{content}</CardContent>
         </Card>

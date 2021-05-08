@@ -1,4 +1,4 @@
 import { createDevApp } from '@backstage/dev-utils';
-import { plugin } from '../src/plugin';
+import { opsGeniePlugin } from '../src/plugin';
 
-createDevApp().registerPlugin(plugin).render();
+createDevApp().registerPlugin(opsGeniePlugin).render();

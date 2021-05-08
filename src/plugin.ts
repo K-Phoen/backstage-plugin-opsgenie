@@ -1,12 +1,11 @@
 import { configApiRef, createApiFactory, createPlugin, createRouteRef, discoveryApiRef, identityApiRef } from '@backstage/core';
 import { OpsgenieApi, opsgenieApiRef } from './api';
 
-export const rootRouteRef = createRouteRef({
-  path: '',
+export const opsgenieRouteRef = createRouteRef({
   title: 'opsgenie',
 });
 
-export const plugin = createPlugin({
+export const opsGeniePlugin = createPlugin({
   id: 'opsgenie',
   apis: [
     createApiFactory({
@@ -22,4 +21,7 @@ export const plugin = createPlugin({
       },
     }),
   ],
+  routes: {
+    explore: opsgenieRouteRef,
+  },
 });

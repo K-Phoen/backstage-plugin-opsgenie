@@ -141,7 +141,14 @@ const SchedulesGrid = ({ schedules }: { schedules: Schedule[] }) => {
                 {results.filter((_, i) => i >= offset && i < offset + cardsPerPage).map(schedule => <OnCallForScheduleCard key={schedule.id} schedule={schedule} />)}
             </ItemCardGrid>
 
-            <Pagination className={classes.pagination} count={Math.ceil(results.length / cardsPerPage)} page={page} onChange={handleChange} showFirstButton showLastButton />
+            <Pagination
+                className={classes.pagination}
+                count={Math.ceil(results.length / cardsPerPage)}
+                page={page}
+                onChange={handleChange}
+                showFirstButton
+                showLastButton
+            />
         </div>
     );
 };

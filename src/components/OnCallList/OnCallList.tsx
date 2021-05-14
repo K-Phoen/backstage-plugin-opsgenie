@@ -3,9 +3,18 @@ import { opsgenieApiRef } from '../../api';
 import { useApi, Progress, ItemCardGrid, StatusOK, StatusAborted } from "@backstage/core";
 import { useAsync } from "react-use";
 import Alert from "@material-ui/lab/Alert";
-import { Card, CardContent, CardHeader, List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
+import { Card, CardContent, CardHeader, createStyles, List, ListItem, ListItemIcon, ListItemText, makeStyles } from '@material-ui/core';
 import PersonIcon from '@material-ui/icons/Person';
 import { Schedule } from '../../types';
+import { Pagination } from '@material-ui/lab';
+
+const useStyles = makeStyles((theme) =>
+  createStyles({
+    pagination: {
+      marginTop: theme.spacing(2),
+    },
+  }),
+);
 
 const OnCallForScheduleCard = ({ schedule }: { schedule: Schedule }) => {
     const opsgenieApi = useApi(opsgenieApiRef);
@@ -54,6 +63,28 @@ const OnCallForScheduleCard = ({ schedule }: { schedule: Schedule }) => {
     );
 };
 
+const SchedulesGrid = ({ schedules }: { schedules: Schedule[] }) => {
+    const classes = useStyles();
+    const cardsPerPage = 5;
+
+    const [page, setPage] = React.useState(1);
+    const [offset, setOffset] = React.useState(0);
+    const handleChange = (_: React.ChangeEvent<unknown>, value: number) => {
+        setOffset((value - 1) * cardsPerPage);
+        setPage(value);
+    };
+
+    return (
+        <div>
+            <ItemCardGrid>
+                {schedules.filter((_, i) => i >= offset && i < offset + cardsPerPage).map((schedule, i) => <OnCallForScheduleCard key={i} schedule={schedule} />)}
+            </ItemCardGrid>
+
+            <Pagination className={classes.pagination} count={Math.ceil(schedules.length / cardsPerPage)} page={page} onChange={handleChange} showFirstButton showLastButton />
+        </div>
+    );
+};
+
 export const OnCallList = () => {
     const opsgenieApi = useApi(opsgenieApiRef);
     const { value, loading, error } = useAsync(async () => await opsgenieApi.getSchedules());
@@ -68,9 +99,5 @@ export const OnCallList = () => {
         );
     }
 
-    return (
-        <ItemCardGrid>
-            {value!.map((schedule, i) => <OnCallForScheduleCard key={i} schedule={schedule} />)}
-        </ItemCardGrid>
-    );
+    return <SchedulesGrid schedules={value!} />;
 };

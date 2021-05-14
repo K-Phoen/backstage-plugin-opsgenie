@@ -1,20 +1,47 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { opsgenieApiRef } from '../../api';
 import { useApi, Progress, ItemCardGrid, StatusOK, StatusAborted } from "@backstage/core";
 import { useAsync } from "react-use";
 import Alert from "@material-ui/lab/Alert";
-import { Card, CardContent, CardHeader, createStyles, List, ListItem, ListItemIcon, ListItemText, makeStyles } from '@material-ui/core';
+import { Card, CardContent, CardHeader, createStyles, TextField, InputAdornment, List, ListItem, ListItemIcon, ListItemText, makeStyles } from '@material-ui/core';
 import PersonIcon from '@material-ui/icons/Person';
 import { Schedule } from '../../types';
 import { Pagination } from '@material-ui/lab';
+import SearchIcon from '@material-ui/icons/Search';
 
 const useStyles = makeStyles((theme) =>
   createStyles({
     pagination: {
       marginTop: theme.spacing(2),
     },
+    search: {
+      marginBottom: theme.spacing(2),
+    },
   }),
 );
+
+const useDebounce = (value: string, delay: number) => {
+    const [debouncedValue, setDebouncedValue] = React.useState(value);
+
+    useEffect(
+      () => {
+        // Update debounced value after delay
+        const handler = setTimeout(() => {
+          setDebouncedValue(value);
+        }, delay);
+
+        // Cancel the timeout if value changes (also on delay change or unmount)
+        // This is how we prevent debounced value from updating if value is changed ...
+        // .. within the delay period. Timeout gets cleared and restarted.
+        return () => {
+          clearTimeout(handler);
+        };
+      },
+      [value, delay] // Only re-call effect if value or delay changes
+    );
+
+    return debouncedValue;
+  }
 
 const OnCallForScheduleCard = ({ schedule }: { schedule: Schedule }) => {
     const opsgenieApi = useApi(opsgenieApiRef);
@@ -67,20 +94,54 @@ const SchedulesGrid = ({ schedules }: { schedules: Schedule[] }) => {
     const classes = useStyles();
     const cardsPerPage = 5;
 
+    const [results, setResults] = React.useState(schedules);
+    const [search, setSearch] = React.useState("");
     const [page, setPage] = React.useState(1);
     const [offset, setOffset] = React.useState(0);
     const handleChange = (_: React.ChangeEvent<unknown>, value: number) => {
         setOffset((value - 1) * cardsPerPage);
         setPage(value);
     };
+    const debouncedSearch = useDebounce(search, 300);
+
+    // debounced search
+    useEffect(
+        () => {
+            if (!debouncedSearch) {
+                setResults(schedules);
+                return;
+            }
+
+            const filtered = schedules.filter(schedule => {
+                return schedule.name.toLowerCase().includes(debouncedSearch.toLowerCase());
+            });
+            setResults(filtered);
+        },
+        [debouncedSearch, schedules]
+      );
 
     return (
         <div>
+            <TextField
+                fullWidth
+                variant="outlined"
+                className={classes.search}
+                placeholder="Team…"
+                InputProps={{
+                    startAdornment: (
+                        <InputAdornment position="start">
+                            <SearchIcon />
+                        </InputAdornment>
+                    )
+                }}
+                onChange={e => setSearch(e.target.value)}
+            />
+
             <ItemCardGrid>
-                {schedules.filter((_, i) => i >= offset && i < offset + cardsPerPage).map((schedule, i) => <OnCallForScheduleCard key={i} schedule={schedule} />)}
+                {results.filter((_, i) => i >= offset && i < offset + cardsPerPage).map(schedule => <OnCallForScheduleCard key={schedule.id} schedule={schedule} />)}
             </ItemCardGrid>
 
-            <Pagination className={classes.pagination} count={Math.ceil(schedules.length / cardsPerPage)} page={page} onChange={handleChange} showFirstButton showLastButton />
+            <Pagination className={classes.pagination} count={Math.ceil(results.length / cardsPerPage)} page={page} onChange={handleChange} showFirstButton showLastButton />
         </div>
     );
 };

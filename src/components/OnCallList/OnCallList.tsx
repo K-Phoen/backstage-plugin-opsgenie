@@ -3,7 +3,7 @@ import { opsgenieApiRef } from '../../api';
 import { useApi, Progress, ItemCardGrid, StatusOK, StatusAborted } from "@backstage/core";
 import { useAsync } from "react-use";
 import Alert from "@material-ui/lab/Alert";
-import { Card, CardContent, CardHeader, createStyles, TextField, InputAdornment, List, ListItem, ListItemIcon, ListItemText, makeStyles } from '@material-ui/core';
+import { Card, CardContent, CardHeader, createStyles, TextField, InputAdornment, List, ListItem, ListItemIcon, ListItemText, makeStyles, Tooltip } from '@material-ui/core';
 import PersonIcon from '@material-ui/icons/Person';
 import { Schedule } from '../../types';
 import { Pagination } from '@material-ui/lab';
@@ -79,7 +79,9 @@ const OnCallForScheduleCard = ({ schedule }: { schedule: Schedule }) => {
 
     const title = (
         <div style={ {display: "flex"} }>
-            {schedule.enabled ? <StatusOK /> : <StatusAborted />}
+            <Tooltip title={schedule.enabled ? 'Enabled' : 'Disabled'}>
+                <div>{schedule.enabled ? <StatusOK /> : <StatusAborted />}</div>
+            </Tooltip>
             {schedule.ownerTeam.name}
         </div>
     );

@@ -7,6 +7,7 @@ export interface Alert {
   isSeen: boolean;
   snoozed: boolean;
   tags: string[]; // ["Critical", "owner:some-team", "service:business-critical"]
+  priority: string; // TODO: enum
   createdAt: string;
   updatedAt: string;
 }

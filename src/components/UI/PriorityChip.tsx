@@ -1,6 +1,5 @@
 import React from 'react';
-import { Chip, withStyles } from '@material-ui/core';
-import { Incident } from '../../types';
+import { Chip, Tooltip, withStyles } from '@material-ui/core';
 
 const P5Chip = withStyles({
     root: {
@@ -41,21 +40,31 @@ const priorityLabels = {
     'P1': 'Critical',
 } as Record<string, string>;
 
-export const PriorityChip = ({ incident }: {incident: Incident}) => {
-    const label = `${incident.priority} — ${priorityLabels[incident.priority]}`;
-
-    switch (incident.priority) {
+export const PriorityChip = ({ priority }: {priority: string}) => {
+    let chip = <></>;
+    switch (priority) {
         case 'P5':
-            return <P5Chip label={label} size="small" />;
+            chip = <P5Chip label={priority} size="small" />;
+            break;
         case 'P4':
-            return <P4Chip label={label} size="small" />;
+            chip = <P4Chip label={priority} size="small" />;
+            break;
         case 'P3':
-            return <P3Chip label={label} size="small" />;
+            chip = <P3Chip label={priority} size="small" />;
+            break;
         case 'P2':
-            return <P2Chip label={label} size="small" />;
+            chip = <P2Chip label={priority} size="small" />;
+            break;
         case 'P1':
-            return <P1Chip label={label} size="small" />;
+            chip = <P1Chip label={priority} size="small" />;
+            break;
         default:
-            return <Chip label={label} size="small" />;
+            chip = <Chip label={priority} size="small" />;
     }
+
+    return (
+        <Tooltip title={priorityLabels[priority]}>
+            <div>{chip}</div>
+        </Tooltip>
+    )
 };

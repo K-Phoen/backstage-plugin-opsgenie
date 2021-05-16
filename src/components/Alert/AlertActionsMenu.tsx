@@ -5,7 +5,7 @@ import Link from '@material-ui/core/Link';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import OpenInNewIcon from '@material-ui/icons/OpenInNew';
-import VisibilityIcon from '@material-ui/icons/Visibility';
+import DoneAll from '@material-ui/icons/DoneAll';
 
 import { opsgenieApiRef } from '../../api';
 import { Alert } from '../../types';
@@ -74,7 +74,7 @@ export const AlertActionsMenu = ({ alert, onAlertChanged }: { alert: Alert, onAl
                 {!alert.acknowledged && alert.status !== 'closed' &&
                     (<MenuItem key="ack" onClick={handleAcknowledge}>
                         <ListItemIcon>
-                            <VisibilityIcon fontSize="small" />
+                            <DoneAll fontSize="small" />
                         </ListItemIcon>
                         <Typography variant="inherit" noWrap>
                             Acknowledge

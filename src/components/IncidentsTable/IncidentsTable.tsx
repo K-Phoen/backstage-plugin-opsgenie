@@ -4,7 +4,7 @@ import { Chip } from '@material-ui/core';
 import Link from '@material-ui/core/Link';
 import { opsgenieApiRef } from '../../api';
 import { Incident } from '../../types';
-import { PriorityChip } from './PriorityChip';
+import { PriorityChip } from '../UI/PriorityChip';
 
 export const IncidentsTable = ({ incidents }: {incidents: Incident[]}) => {
     const opsgenieApi = useApi(opsgenieApiRef);
@@ -31,7 +31,7 @@ export const IncidentsTable = ({ incidents }: {incidents: Incident[]}) => {
             field: 'priority',
             cellStyle: smallColumnStyle,
             headerStyle: smallColumnStyle,
-            render: rowData => <PriorityChip incident={rowData as Incident} />
+            render: rowData => <PriorityChip priority={(rowData as Incident).priority} />
         },
         {
             title: 'Status',

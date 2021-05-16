@@ -5,6 +5,8 @@ import Link from '@material-ui/core/Link';
 import { AlertActionsMenu } from '../Alert/AlertActionsMenu';
 import { opsgenieApiRef } from '../../api';
 import { Alert } from '../../types';
+import { StatusChip } from './StatusChip';
+import { PriorityChip } from '../UI/PriorityChip';
 
 export const AlertsTable = ({ alerts }: {alerts: Alert[]}) => {
     const opsgenieApi = useApi(opsgenieApiRef);
@@ -39,22 +41,22 @@ export const AlertsTable = ({ alerts }: {alerts: Alert[]}) => {
             render: rowData => <Link href={opsgenieApi.getAlertDetailsURL(rowData as Alert)}>#{(rowData as Alert).tinyId}</Link>
         },
         {
+            title: 'Priority',
+            field: 'priority',
+            cellStyle: smallColumnStyle,
+            headerStyle: smallColumnStyle,
+            render: rowData => <PriorityChip priority={(rowData as Alert).priority} />
+        },
+        {
             title: 'Status',
             field: 'status',
             cellStyle: smallColumnStyle,
             headerStyle: smallColumnStyle,
-            render: rowData => <Chip label={(rowData as Alert).status} color={(rowData as Alert).status === 'open' ? 'secondary' : 'default'} size="small" />
+            render: rowData => <StatusChip alert={rowData as Alert} />,
         },
         {
             title: 'Alert',
             field: 'message',
-        },
-        {
-            title: 'Acknowledged',
-            field: 'acknowledged',
-            type: 'boolean',
-            cellStyle: smallColumnStyle,
-            headerStyle: smallColumnStyle,
         },
         {
             title: 'Tags',

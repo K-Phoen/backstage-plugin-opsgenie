@@ -17,6 +17,9 @@ const useStyles = makeStyles((theme) =>
     search: {
       marginBottom: theme.spacing(2),
     },
+    onCallItemGrid: {
+        gridTemplateColumns: 'repeat(auto-fill, minmax(32em, 1fr))',
+    }
   }),
 );
 
@@ -92,7 +95,7 @@ const OnCallForScheduleCard = ({ schedule }: { schedule: Schedule }) => {
 
 const SchedulesGrid = ({ schedules }: { schedules: Schedule[] }) => {
     const classes = useStyles();
-    const cardsPerPage = 5;
+    const cardsPerPage = 6;
 
     const [results, setResults] = React.useState(schedules);
     const [search, setSearch] = React.useState("");
@@ -137,7 +140,7 @@ const SchedulesGrid = ({ schedules }: { schedules: Schedule[] }) => {
                 onChange={e => setSearch(e.target.value)}
             />
 
-            <ItemCardGrid>
+            <ItemCardGrid classes={{root: classes.onCallItemGrid}}>
                 {results.filter((_, i) => i >= offset && i < offset + cardsPerPage).map(schedule => <OnCallForScheduleCard key={schedule.id} schedule={schedule} />)}
             </ItemCardGrid>
 

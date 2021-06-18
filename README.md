@@ -80,3 +80,5 @@ be defined:
 annotations:
   opsgenie.com/component-selector: 'tag:"service:my-awesome-service"'
 ```
+
+This annotation accepts any valid [Opsgenie search query](https://support.atlassian.com/opsgenie/docs/search-queries-for-alerts/) for alerts.

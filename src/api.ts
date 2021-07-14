@@ -1,7 +1,7 @@
 import { Entity } from '@backstage/catalog-model';
-import { createApiRef, DiscoveryApi, IdentityApi } from '@backstage/core';
 import { OPSGENIE_ANNOTATION } from './integration';
 import { Alert, Incident, OnCallParticipantRef, Schedule } from './types';
+import { createApiRef, DiscoveryApi, IdentityApi } from '@backstage/core-plugin-api';
 
 export const opsgenieApiRef = createApiRef<Opsgenie>({
   id: 'plugin.opsgenie.service',

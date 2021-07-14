@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { opsgenieApiRef } from '../../api';
-import { useApi, Progress, ItemCardGrid, StatusOK, StatusAborted } from "@backstage/core";
 import { useAsync } from "react-use";
 import Alert from "@material-ui/lab/Alert";
 import { Card, CardContent, CardHeader, createStyles, TextField, InputAdornment, List, ListItem, ListItemIcon, ListItemText, makeStyles, Tooltip } from '@material-ui/core';
@@ -8,6 +7,9 @@ import PersonIcon from '@material-ui/icons/Person';
 import { Schedule } from '../../types';
 import { Pagination } from '@material-ui/lab';
 import SearchIcon from '@material-ui/icons/Search';
+
+import { useApi } from '@backstage/core-plugin-api';
+import { Progress, ItemCardGrid, StatusOK, StatusAborted } from '@backstage/core-components';
 
 const useStyles = makeStyles((theme) =>
   createStyles({

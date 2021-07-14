@@ -1,7 +1,7 @@
 import React from 'react';
-import { StatusError, StatusOK } from '@backstage/core';
 import { makeStyles, Tooltip } from "@material-ui/core";
 import { Alert } from "../../types";
+import { StatusError, StatusOK } from '@backstage/core-components';
 
 const useStyles = makeStyles({
     denseListIcon: {

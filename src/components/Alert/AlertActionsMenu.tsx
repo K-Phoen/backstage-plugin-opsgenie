@@ -1,14 +1,14 @@
 import React from 'react';
-import { alertApiRef, useApi } from '@backstage/core';
 import { IconButton, ListItemIcon, Menu, MenuItem, Typography } from '@material-ui/core';
 import Link from '@material-ui/core/Link';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 import DoneAll from '@material-ui/icons/DoneAll';
-
 import { opsgenieApiRef } from '../../api';
+
 import { Alert } from '../../types';
+import { alertApiRef, useApi } from '@backstage/core-plugin-api';
 
 
 export const AlertActionsMenu = ({ alert, onAlertChanged }: { alert: Alert, onAlertChanged?: (alert: Alert) => void }) => {

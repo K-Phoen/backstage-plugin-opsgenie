@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Table, TableColumn, useApi } from '@backstage/core';
 import { Chip } from '@material-ui/core';
 import Link from '@material-ui/core/Link';
 import { AlertActionsMenu } from '../Alert/AlertActionsMenu';
@@ -7,6 +6,9 @@ import { opsgenieApiRef } from '../../api';
 import { Alert } from '../../types';
 import { StatusChip } from './StatusChip';
 import { PriorityChip } from '../UI/PriorityChip';
+
+import { Table, TableColumn } from '@backstage/core-components';
+import { useApi } from '@backstage/core-plugin-api';
 
 export const AlertsTable = ({ alerts }: {alerts: Alert[]}) => {
     const opsgenieApi = useApi(opsgenieApiRef);

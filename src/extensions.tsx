@@ -1,5 +1,5 @@
-import { createComponentExtension, createRoutableExtension } from '@backstage/core';
 import { opsGeniePlugin, opsgenieRouteRef } from './plugin';
+import { createComponentExtension, createRoutableExtension } from '@backstage/core-plugin-api';
 
 export const OpsgeniePage = opsGeniePlugin.provide(
   createRoutableExtension({

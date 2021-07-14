@@ -1,9 +1,12 @@
 import React from 'react';
 import {opsgenieApiRef} from '../../api';
-import {useApi, Progress} from "@backstage/core";
 import {useAsync} from "react-use";
 import Alert from "@material-ui/lab/Alert";
 import { IncidentsTable } from './IncidentsTable';
+
+
+import { useApi } from '@backstage/core-plugin-api';
+import { Progress } from '@backstage/core-components';
 
 
 export const IncidentsList = () => {

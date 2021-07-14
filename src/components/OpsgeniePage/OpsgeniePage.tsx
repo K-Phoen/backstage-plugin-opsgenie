@@ -1,8 +1,8 @@
 import React from 'react';
-import { Page, Header, Content, Tabs } from "@backstage/core";
 import { AlertsList } from '../AlertsTable';
 import { IncidentsList } from '../IncidentsTable';
 import { OnCallList } from '../OnCallList';
+import { Page, Header, Content, Tabs } from '@backstage/core-components';
 
 export const OpsgeniePage = () => {
     return (

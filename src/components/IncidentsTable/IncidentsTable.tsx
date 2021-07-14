@@ -1,10 +1,12 @@
 import React from 'react';
-import { Table, TableColumn, useApi } from '@backstage/core';
 import { Chip } from '@material-ui/core';
 import Link from '@material-ui/core/Link';
 import { opsgenieApiRef } from '../../api';
 import { Incident } from '../../types';
 import { PriorityChip } from '../UI/PriorityChip';
+
+import { Table, TableColumn } from '@backstage/core-components';
+import { useApi } from '@backstage/core-plugin-api';
 
 export const IncidentsTable = ({ incidents }: {incidents: Incident[]}) => {
     const opsgenieApi = useApi(opsgenieApiRef);

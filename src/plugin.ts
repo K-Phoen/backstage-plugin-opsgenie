@@ -1,5 +1,12 @@
-import { configApiRef, createApiFactory, createPlugin, createRouteRef, discoveryApiRef, identityApiRef } from '@backstage/core';
 import { OpsgenieApi, opsgenieApiRef } from './api';
+import {
+  configApiRef,
+  createApiFactory,
+  createPlugin,
+  createRouteRef,
+  discoveryApiRef,
+  identityApiRef,
+} from '@backstage/core-plugin-api';
 
 export const opsgenieRouteRef = createRouteRef({
   title: 'opsgenie',

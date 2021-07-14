@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Progress, useApi } from '@backstage/core';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, makeStyles, Typography } from '@material-ui/core';
 import { useAsync } from 'react-use';
 import { Alert as AlertUI } from '@material-ui/lab';
@@ -9,6 +8,9 @@ import moment from "moment";
 import { opsgenieApiRef } from '../../api';
 import { Alert } from '../../types';
 import { AlertStatus, AlertActionsMenu } from '../Alert';
+
+import { Progress } from '@backstage/core-components';
+import { useApi } from '@backstage/core-plugin-api';
 
 const useStyles = makeStyles({
     listItemPrimary: {

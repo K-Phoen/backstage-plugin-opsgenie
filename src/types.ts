@@ -21,6 +21,8 @@ export interface Incident {
   priority: string; // TODO: enum
   createdAt: string;
   updatedAt: string;
+  impactStartDate: string;
+  impactEndDate: string;
 }
 
 export interface TeamRef {

@@ -3,6 +3,7 @@ import { AlertsList } from '../AlertsTable';
 import { IncidentsList } from '../IncidentsTable';
 import { OnCallList } from '../OnCallList';
 import { Page, Header, Content, Tabs } from '@backstage/core-components';
+import { Analytics } from '../Analytics';
 
 export const OpsgeniePage = () => {
     return (
@@ -23,6 +24,10 @@ export const OpsgeniePage = () => {
                         {
                             label: 'Incidents',
                             content: <IncidentsList />,
+                        },
+                        {
+                            label: 'Analytics',
+                            content: <Analytics />,
                         },
                     ]}
                 />

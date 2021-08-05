@@ -3,7 +3,7 @@ import moment from "moment"
 import { IconButton } from '@material-ui/core';
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
 import {
-    ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Legend
+    ComposedChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Legend
 } from 'recharts';
 import { InfoCard, Progress } from '@backstage/core-components';
 import { useApi } from '@backstage/core-plugin-api';
@@ -11,10 +11,10 @@ import { opsgenieApiRef } from '../../api';
 import { useAsync } from 'react-use';
 import { Alert } from '@material-ui/lab';
 import { Incident } from '../../types';
-import { exportGraph, isBusinessHours } from './utils';
+import { exportGraph } from './utils';
 
-const WeeklyIncidentsGraph = ({ incidents }: { incidents: Incident[] }) => {
-    const incidentsBuckets: Record<string, { businessHours: number, onCallHours: number, total: number, date: moment.Moment }> = {};
+const SeverityGraph = ({ incidents }: { incidents: Incident[] }) => {
+    const incidentsBuckets: Record<string, { p1: number, p2: number, p3: number, p4: number, p5: number, date: moment.Moment }> = {};
 
     let minDate: moment.Moment = moment().startOf('isoWeek');
     let maxDate: moment.Moment = moment().startOf('isoWeek');
@@ -25,18 +25,25 @@ const WeeklyIncidentsGraph = ({ incidents }: { incidents: Incident[] }) => {
 
         if (!incidentsBuckets[week]) {
             incidentsBuckets[week] = {
-                businessHours: 0,
-                onCallHours: 0,
-                total: 0,
+                p1: 0,
+                p2: 0,
+                p3: 0,
+                p4: 0,
+                p5: 0,
                 date: incidentDate,
             };
         }
 
-        incidentsBuckets[week].total += 1;
-        if (isBusinessHours(incidentDate)) {
-            incidentsBuckets[week].businessHours += 1;
-        } else {
-            incidentsBuckets[week].onCallHours += 1;
+        if (incident.priority == 'P1') {
+            incidentsBuckets[week].p1 += 1;
+        } else if (incident.priority == 'P2') {
+            incidentsBuckets[week].p2 += 1;
+        } else if (incident.priority == 'P3') {
+            incidentsBuckets[week].p3 += 1;
+        } else if (incident.priority == 'P4') {
+            incidentsBuckets[week].p4 += 1;
+        } else if (incident.priority == 'P5') {
+            incidentsBuckets[week].p5 += 1;
         }
 
         if (incidentDate < minDate) {
@@ -50,9 +57,11 @@ const WeeklyIncidentsGraph = ({ incidents }: { incidents: Incident[] }) => {
 
         if (!incidentsBuckets[week]) {
             incidentsBuckets[week] = {
-                businessHours: 0,
-                onCallHours: 0,
-                total: 0,
+                p1: 0,
+                p2: 0,
+                p3: 0,
+                p4: 0,
+                p5: 0,
                 date: minDate.clone(),
             };
         }
@@ -63,9 +72,11 @@ const WeeklyIncidentsGraph = ({ incidents }: { incidents: Incident[] }) => {
     const data = Object.keys(incidentsBuckets).map(week => (
         {
             week: week,
-            businessHours: incidentsBuckets[week].businessHours,
-            onCallHours: incidentsBuckets[week].onCallHours,
-            total: incidentsBuckets[week].total,
+            p1: incidentsBuckets[week].p1,
+            p2: incidentsBuckets[week].p2,
+            p3: incidentsBuckets[week].p3,
+            p4: incidentsBuckets[week].p4,
+            p5: incidentsBuckets[week].p5,
             date: incidentsBuckets[week].date,
         }
     ));
@@ -82,7 +93,7 @@ const WeeklyIncidentsGraph = ({ incidents }: { incidents: Incident[] }) => {
     });
 
     return (
-        <div id="weekly-incidents" style={{ width: '100%', height: 300, paddingTop: '1.2rem', paddingRight: '1.2rem' }}>
+        <div id="weekly-incidents-severity" style={{ width: '100%', height: 300, paddingTop: '1.2rem', paddingRight: '1.2rem' }}>
             <ResponsiveContainer>
                 <ComposedChart
                     data={data}
@@ -90,9 +101,11 @@ const WeeklyIncidentsGraph = ({ incidents }: { incidents: Incident[] }) => {
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="week" />
                     <YAxis />
-                    <Bar dataKey="businessHours" fill="#82ca9d" name="Business hours" stackId="a" barSize={30} />
-                    <Bar dataKey="onCallHours" fill="#8884d8" name="On-call hours" stackId="a" barSize={30} />
-                    <Line type="monotone" dataKey="total" name="Total" stroke="#ff7300" />
+                    <Bar dataKey="p1" fill="#bf2600" name="P1 - Critical" stackId="a" barSize={30} />
+                    <Bar dataKey="p2" fill="#ff7452" name="P2 - High" stackId="a" barSize={30} />
+                    <Bar dataKey="p3" fill="#ffab00" name="P3 - Moderate" stackId="a" barSize={30} />
+                    <Bar dataKey="p4" fill="#36b37e" name="P4 - Low" stackId="a" barSize={30} />
+                    <Bar dataKey="p5" fill="#00857A" name="P5 - Informational" stackId="a" barSize={30} />
                     <Tooltip />
                     <Legend />
                 </ComposedChart>
@@ -101,7 +114,7 @@ const WeeklyIncidentsGraph = ({ incidents }: { incidents: Incident[] }) => {
     );
 };
 
-export const WeeklyIncidents = () => {
+export const WeeklyIncidentsSeverity = () => {
     const opsgenieApi = useApi(opsgenieApiRef);
     const { value, loading, error } = useAsync(async () => await opsgenieApi.getIncidents({ limit: 100 }));
 
@@ -116,7 +129,7 @@ export const WeeklyIncidents = () => {
     }
 
     const onExport = () => {
-        exportGraph("weekly-incidents");
+        exportGraph("weekly-incidents-severity");
     };
 
     const action = (
@@ -125,8 +138,8 @@ export const WeeklyIncidents = () => {
         </IconButton>
     );
     return (
-        <InfoCard title="Incidents by week" action={action}>
-            <WeeklyIncidentsGraph incidents={value!} />
+        <InfoCard title="Incidents by week and severity" action={action}>
+            <SeverityGraph incidents={value!} />
         </InfoCard>
     );
 };

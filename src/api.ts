@@ -14,6 +14,8 @@ type AlertsFetchOpts = {
 
 type IncidentsFetchOpts = {
   limit?: number
+  sort?: string;
+  order?: string;
 }
 
 export interface Opsgenie {
@@ -113,11 +115,13 @@ export class OpsgenieApi implements Opsgenie {
     return response.data;
   }
 
-  async getIncidents(opts?: AlertsFetchOpts): Promise<Incident[]> {
+  async getIncidents(opts?: IncidentsFetchOpts): Promise<Incident[]> {
     const limit = opts?.limit || 50;
+    const sort = opts?.sort || 'createdAt';
+    const order = opts?.order || 'desc';
     const init = await this.addAuthHeaders({});
 
-    const response = await this.fetch<IncidentsResponse>(`/v1/incidents?limit=${limit}`, init);
+    const response = await this.fetch<IncidentsResponse>(`/v1/incidents?limit=${limit}&sort=${sort}&order=${order}`, init);
 
     return response.data;
   }

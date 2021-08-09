@@ -1,23 +1,19 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, Divider } from '@material-ui/core';
 import { useEntity } from '@backstage/plugin-catalog-react';
 import { AlertsSummary } from './AlertsSummary';
-
+import { InfoCard, InfoCardVariants } from '@backstage/core-components';
 
 type AlertsCardProps = {
     title?: string;
+    variant?: InfoCardVariants;
 };
 
-export const AlertsCard = ({ title }: AlertsCardProps) => {
+export const AlertsCard = ({ title, variant }: AlertsCardProps) => {
     const { entity } = useEntity();
 
     return (
-        <Card>
-            <CardHeader title={title || "Opsgenie — Alerts"} />
-            <Divider />
-            <CardContent>
-                <AlertsSummary entity={entity} />
-            </CardContent>
-        </Card>
-      );
+        <InfoCard title={title || "Opsgenie — Alerts"} variant={variant || "gridItem"}>
+            <AlertsSummary entity={entity} />
+        </InfoCard>
+    );
 };

@@ -12,6 +12,11 @@ export interface Alert {
   updatedAt: string;
 }
 
+export interface ResponderRef {
+  id: string; // UUID
+  type: string; // "team", "user"
+}
+
 export interface Incident {
   id: string; // UUID
   tinyId: string;
@@ -23,6 +28,8 @@ export interface Incident {
   updatedAt: string;
   impactStartDate: string;
   impactEndDate: string;
+  responders: ResponderRef[];
+  extraProperties: Record<string, string>;
 }
 
 export interface TeamRef {

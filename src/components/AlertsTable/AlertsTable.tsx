@@ -33,28 +33,28 @@ export const AlertsTable = ({ alerts }: {alerts: Alert[]}) => {
         }));
     };
 
-    const columns: TableColumn[] = [
+    const columns: TableColumn<Alert>[] = [
         {
             title: 'ID',
             field: 'tinyId',
             highlight: true,
             cellStyle: smallColumnStyle,
             headerStyle: smallColumnStyle,
-            render: rowData => <Link href={opsgenieApi.getAlertDetailsURL(rowData as Alert)}>#{(rowData as Alert).tinyId}</Link>
+            render: rowData => <Link href={opsgenieApi.getAlertDetailsURL(rowData)}>#{rowData.tinyId}</Link>
         },
         {
             title: 'Priority',
             field: 'priority',
             cellStyle: smallColumnStyle,
             headerStyle: smallColumnStyle,
-            render: rowData => <PriorityChip priority={(rowData as Alert).priority} />
+            render: rowData => <PriorityChip priority={rowData.priority} />
         },
         {
             title: 'Status',
             field: 'status',
             cellStyle: smallColumnStyle,
             headerStyle: smallColumnStyle,
-            render: rowData => <StatusChip alert={rowData as Alert} />,
+            render: rowData => <StatusChip alert={rowData} />,
         },
         {
             title: 'Alert',
@@ -63,7 +63,7 @@ export const AlertsTable = ({ alerts }: {alerts: Alert[]}) => {
         {
             title: 'Tags',
             field: 'tags',
-            render: rowData => <>{(rowData as Alert).tags.map((tag) => <Chip label={tag} size="small" />)}</>
+            render: rowData => <>{rowData.tags.map((tag, i) => <Chip label={tag} key={i} size="small" />)}</>
         },
         {
             title: 'Updated At',
@@ -78,7 +78,7 @@ export const AlertsTable = ({ alerts }: {alerts: Alert[]}) => {
             field: '',
             cellStyle: smallColumnStyle,
             headerStyle: smallColumnStyle,
-            render: rowData => <AlertActionsMenu alert={rowData as Alert} onAlertChanged={onAlertChanged} />
+            render: rowData => <AlertActionsMenu alert={rowData} onAlertChanged={onAlertChanged} />
         },
     ];
 

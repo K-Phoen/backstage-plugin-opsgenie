@@ -19,28 +19,28 @@ export const IncidentsTable = ({ incidents }: {incidents: Incident[]}) => {
         maxWidth: '10%',
     };
 
-    const columns: TableColumn[] = [
+    const columns: TableColumn<Incident>[] = [
         {
             title: 'ID',
             field: 'tinyId',
             highlight: true,
             cellStyle: smallColumnStyle,
             headerStyle: smallColumnStyle,
-            render: rowData => <Link href={opsgenieApi.getIncidentDetailsURL(rowData as Incident)}>#{(rowData as Incident).tinyId}</Link>
+            render: rowData => <Link href={opsgenieApi.getIncidentDetailsURL(rowData)}>#{(rowData).tinyId}</Link>
         },
         {
             title: 'Priority',
             field: 'priority',
             cellStyle: smallColumnStyle,
             headerStyle: smallColumnStyle,
-            render: rowData => <PriorityChip priority={(rowData as Incident).priority} />
+            render: rowData => <PriorityChip priority={rowData.priority} />
         },
         {
             title: 'Status',
             field: 'status',
             cellStyle: smallColumnStyle,
             headerStyle: smallColumnStyle,
-            render: rowData => <Chip  label={(rowData as Incident).status} color={(rowData as Incident).status === 'open' ? 'secondary' : 'default'} size="small" />
+            render: rowData => <Chip  label={rowData.status} color={rowData.status === 'open' ? 'secondary' : 'default'} size="small" />
         },
         {
             title: 'Description',
@@ -49,7 +49,7 @@ export const IncidentsTable = ({ incidents }: {incidents: Incident[]}) => {
         {
             title: 'Tags',
             field: 'tags',
-            render: rowData => <>{(rowData as Incident).tags.map((tag) => <Chip label={tag} size="small" />)}</>
+            render: rowData => <>{rowData.tags.map((tag, i) => <Chip label={tag} key={i} size="small" />)}</>
         },
         {
             title: 'Updated At',

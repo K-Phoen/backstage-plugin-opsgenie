@@ -24,8 +24,8 @@ const teamName = (teams: Team[], teamId: string): string => {
 };
 
 export const respondingTeam = (teams: Team[], incident: Incident): string => {
-  if (incident.extraProperties['responders']) {
-    return incident.extraProperties['responders'];
+  if (incident.extraProperties.responders) {
+    return incident.extraProperties.responders;
   }
 
   const teamResponders = incident.responders.filter((responderRef) => responderRef.type === "team");
@@ -109,7 +109,7 @@ export class AnalitycsApi implements Analytics {
     const incidentsBuckets: Record<string, { p1: number, p2: number, p3: number, p4: number, p5: number, date: moment.Moment }> = {};
 
     let minDate: moment.Moment = moment().startOf('isoWeek');
-    let maxDate: moment.Moment = moment().startOf('isoWeek');
+    const maxDate: moment.Moment = moment().startOf('isoWeek');
 
     incidents.forEach((incident) => {
       const incidentDate = moment(incident.impactStartDate);
@@ -126,15 +126,15 @@ export class AnalitycsApi implements Analytics {
         };
       }
 
-      if (incident.priority == 'P1') {
+      if (incident.priority === 'P1') {
         incidentsBuckets[week].p1 += 1;
-      } else if (incident.priority == 'P2') {
+      } else if (incident.priority === 'P2') {
         incidentsBuckets[week].p2 += 1;
-      } else if (incident.priority == 'P3') {
+      } else if (incident.priority === 'P3') {
         incidentsBuckets[week].p3 += 1;
-      } else if (incident.priority == 'P4') {
+      } else if (incident.priority === 'P4') {
         incidentsBuckets[week].p4 += 1;
-      } else if (incident.priority == 'P5') {
+      } else if (incident.priority === 'P5') {
         incidentsBuckets[week].p5 += 1;
       }
 
@@ -183,7 +183,7 @@ export class AnalitycsApi implements Analytics {
     const incidentsBuckets: Record<string, { businessHours: number, onCallHours: number, total: number, date: moment.Moment }> = {};
 
     let minDate: moment.Moment = moment().startOf('isoWeek');
-    let maxDate: moment.Moment = moment().startOf('isoWeek');
+    const maxDate: moment.Moment = moment().startOf('isoWeek');
 
     incidents.forEach((incident) => {
       const incidentDate = moment(incident.impactStartDate);
@@ -249,7 +249,7 @@ export class AnalitycsApi implements Analytics {
     const respondersMap: Record<string, boolean> = {};
 
     let minDate: moment.Moment = moment().startOf('isoWeek');
-    let maxDate: moment.Moment = moment().startOf('isoWeek');
+    const maxDate: moment.Moment = moment().startOf('isoWeek');
 
     incidents.forEach((incident) => {
       const incidentDate = moment(incident.impactStartDate);
@@ -320,7 +320,7 @@ export class AnalitycsApi implements Analytics {
     const respondersMap: Record<string, boolean> = {};
 
     let minDate: moment.Moment = moment().startOf('isoWeek');
-    let maxDate: moment.Moment = moment().startOf('isoWeek');
+    const maxDate: moment.Moment = moment().startOf('isoWeek');
 
     incidents.forEach((incident) => {
       const incidentDate = moment(incident.impactStartDate);

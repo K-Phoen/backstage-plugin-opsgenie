@@ -5,6 +5,9 @@ import { Incident, Team } from './types';
 
 const UNKNOWN_TEAM_NAME = "Unknown";
 
+export const DEFAULT_BUSINESS_HOURS_START = 9;
+export const DEFAULT_BUSINESS_HOURS_END = 18;
+
 export const analyticsApiRef = createApiRef<Analytics>({
   id: 'plugin.opsgenie.analytics',
   description: 'Used to generate analytics',
@@ -32,10 +35,6 @@ export const respondingTeam = (teams: Team[], incident: Incident): string => {
   }
 
   return teamName(teams, teamResponders[0].id);
-};
-
-const isBusinessHours = (incidentStartedAt: moment.Moment): boolean => {
-  return incidentStartedAt.hour() >= 9 && incidentStartedAt.hour() < 18;
 };
 
 const sortByDate = (data: DateSortable[]): void => {
@@ -90,11 +89,18 @@ export interface Analytics {
   incidentsByQuarterAndResponder(): Promise<QuarterlyIncidentsByResponders>;
 }
 
+interface BusinessHours {
+  start: number;
+  end: number;
+}
+
 export class AnalitycsApi implements Analytics {
   private readonly opsgenieApi: Opsgenie;
+  private readonly businessHours: BusinessHours;
 
-  constructor(opts: { opsgenieApi: Opsgenie }) {
+  constructor(opts: { opsgenieApi: Opsgenie, businessHours: BusinessHours }) {
     this.opsgenieApi = opts.opsgenieApi;
+    this.businessHours = opts.businessHours;
   }
 
   async incidentsByWeekAndSeverity(): Promise<WeeklyIncidentsBySeverity[]> {
@@ -193,7 +199,7 @@ export class AnalitycsApi implements Analytics {
       }
 
       incidentsBuckets[week].total += 1;
-      if (isBusinessHours(incidentDate)) {
+      if (this.isBusinessHours(incidentDate)) {
         incidentsBuckets[week].businessHours += 1;
       } else {
         incidentsBuckets[week].onCallHours += 1;
@@ -317,56 +323,56 @@ export class AnalitycsApi implements Analytics {
     let maxDate: moment.Moment = moment().startOf('isoWeek');
 
     incidents.forEach((incident) => {
-        const incidentDate = moment(incident.impactStartDate);
-        const quarter = `Q${incidentDate.quarter()} - ${incidentDate.year()}`;
+      const incidentDate = moment(incident.impactStartDate);
+      const quarter = `Q${incidentDate.quarter()} - ${incidentDate.year()}`;
 
-        if (!incidentsBuckets[quarter]) {
-            incidentsBuckets[quarter] = {
-                responders: {},
-                date: incidentDate,
-            };
-        }
+      if (!incidentsBuckets[quarter]) {
+        incidentsBuckets[quarter] = {
+          responders: {},
+          date: incidentDate,
+        };
+      }
 
-        const responder = respondingTeam(teams, incident);
+      const responder = respondingTeam(teams, incident);
 
-        respondersMap[responder] = true;
+      respondersMap[responder] = true;
 
-        if (!incidentsBuckets[quarter].responders[responder]) {
-            incidentsBuckets[quarter].responders[responder] = 0;
-        }
+      if (!incidentsBuckets[quarter].responders[responder]) {
+        incidentsBuckets[quarter].responders[responder] = 0;
+      }
 
-        incidentsBuckets[quarter].responders[responder] += 1;
+      incidentsBuckets[quarter].responders[responder] += 1;
 
-        if (incidentDate < minDate) {
-            minDate = incidentDate.clone().startOf('isoWeek');
-        }
+      if (incidentDate < minDate) {
+        minDate = incidentDate.clone().startOf('isoWeek');
+      }
     });
 
     // add empty buckets for quarters with no incident (let's be hopeful, might happen)
     while (minDate <= maxDate) {
-        const quarter = `Q${minDate.quarter()} - ${minDate.year()}`;
+      const quarter = `Q${minDate.quarter()} - ${minDate.year()}`;
 
-        if (!incidentsBuckets[quarter]) {
-            incidentsBuckets[quarter] = {
-                responders: {},
-                date: minDate.clone(),
-            };
-        }
+      if (!incidentsBuckets[quarter]) {
+        incidentsBuckets[quarter] = {
+          responders: {},
+          date: minDate.clone(),
+        };
+      }
 
-        minDate.add(1, 'weeks');
+      minDate.add(1, 'weeks');
     }
 
     const data = Object.keys(incidentsBuckets).map(quarter => {
-        const dataPoint: any = {
-            quarter: quarter,
-            date: incidentsBuckets[quarter].date,
-        };
+      const dataPoint: any = {
+        quarter: quarter,
+        date: incidentsBuckets[quarter].date,
+      };
 
-        Object.keys(respondersMap).forEach((responder) => {
-            dataPoint[responder] = incidentsBuckets[quarter].responders[responder] || 0;
-        });
+      Object.keys(respondersMap).forEach((responder) => {
+        dataPoint[responder] = incidentsBuckets[quarter].responders[responder] || 0;
+      });
 
-        return dataPoint;
+      return dataPoint;
     });
 
     sortByDate(data);
@@ -375,5 +381,9 @@ export class AnalitycsApi implements Analytics {
       dataPoints: data,
       responders: Object.keys(respondersMap),
     };
+  }
+
+  isBusinessHours(incidentStartedAt: moment.Moment): boolean {
+    return incidentStartedAt.hour() >= this.businessHours.start && incidentStartedAt.hour() < this.businessHours.end;
   }
 }

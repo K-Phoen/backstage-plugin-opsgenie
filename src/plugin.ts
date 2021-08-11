@@ -7,7 +7,7 @@ import {
   discoveryApiRef,
   identityApiRef,
 } from '@backstage/core-plugin-api';
-import { AnalitycsApi, analyticsApiRef } from './analytics';
+import { AnalitycsApi, analyticsApiRef, DEFAULT_BUSINESS_HOURS_END, DEFAULT_BUSINESS_HOURS_START } from './analytics';
 
 export const opsgenieRouteRef = createRouteRef({
   title: 'opsgenie',
@@ -31,9 +31,15 @@ export const opsGeniePlugin = createPlugin({
 
     createApiFactory({
       api: analyticsApiRef,
-      deps: { opsgenieApi: opsgenieApiRef },
-      factory: ({ opsgenieApi }) => {
-        return new AnalitycsApi({opsgenieApi: opsgenieApi});
+      deps: { opsgenieApi: opsgenieApiRef, configApi: configApiRef },
+      factory: ({ opsgenieApi, configApi }) => {
+        return new AnalitycsApi({
+          opsgenieApi: opsgenieApi,
+          businessHours: {
+            start: configApi.getOptionalNumber('opsgenie.analytics.businessHours.start') || DEFAULT_BUSINESS_HOURS_START,
+            end: configApi.getOptionalNumber('opsgenie.analytics.businessHours.end') || DEFAULT_BUSINESS_HOURS_END,
+          },
+        });
       },
     }),
   ],

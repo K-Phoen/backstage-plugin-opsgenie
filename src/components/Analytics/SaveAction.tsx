@@ -11,8 +11,8 @@ const exportGraph = (domNodeId: string) => {
     }
 
     domtoimage.toBlob(node, { bgcolor: 'white' })
-        .then(function (blob: Blob) {
-            fileDownload(blob, domNodeId + '.png');
+        .then((blob: Blob) => {
+            fileDownload(blob, `${domNodeId}.png`);
         });
 }
 

@@ -23,10 +23,10 @@ const ResponderGraph = ({ incidents, teams }: { incidents: Incident[], teams: Te
 
     incidents.forEach((incident) => {
         const incidentDate = moment(incident.impactStartDate);
-        const week = `w${incidentDate.isoWeek()} - ${incidentDate.year()}`;
+        const quarter = `Q${incidentDate.quarter()} - ${incidentDate.year()}`;
 
-        if (!incidentsBuckets[week]) {
-            incidentsBuckets[week] = {
+        if (!incidentsBuckets[quarter]) {
+            incidentsBuckets[quarter] = {
                 responders: {},
                 date: incidentDate,
             };
@@ -36,23 +36,23 @@ const ResponderGraph = ({ incidents, teams }: { incidents: Incident[], teams: Te
 
         respondersMap[responder] = true;
 
-        if (!incidentsBuckets[week].responders[responder]) {
-            incidentsBuckets[week].responders[responder] = 0;
+        if (!incidentsBuckets[quarter].responders[responder]) {
+            incidentsBuckets[quarter].responders[responder] = 0;
         }
 
-        incidentsBuckets[week].responders[responder] += 1;
+        incidentsBuckets[quarter].responders[responder] += 1;
 
         if (incidentDate < minDate) {
             minDate = incidentDate.clone().startOf('isoWeek');
         }
     });
 
-    // add empty buckets for weeks with no incident
+    // add empty buckets for quarters with no incident (let's be hopeful, might happen)
     while (minDate <= maxDate) {
-        const week = `w${minDate.isoWeek()} - ${minDate.year()}`;
+        const quarter = `Q${minDate.quarter()} - ${minDate.year()}`;
 
-        if (!incidentsBuckets[week]) {
-            incidentsBuckets[week] = {
+        if (!incidentsBuckets[quarter]) {
+            incidentsBuckets[quarter] = {
                 responders: {},
                 date: minDate.clone(),
             };
@@ -61,14 +61,14 @@ const ResponderGraph = ({ incidents, teams }: { incidents: Incident[], teams: Te
         minDate.add(1, 'weeks');
     }
 
-    const data = Object.keys(incidentsBuckets).map(week => {
+    const data = Object.keys(incidentsBuckets).map(quarter => {
         const dataPoint: any = {
-            week: week,
-            date: incidentsBuckets[week].date,
+            quarter: quarter,
+            date: incidentsBuckets[quarter].date,
         };
 
         Object.keys(respondersMap).forEach((responder) => {
-            dataPoint[responder] = incidentsBuckets[week].responders[responder] || 0;
+            dataPoint[responder] = incidentsBuckets[quarter].responders[responder] || 0;
         });
 
         return dataPoint;
@@ -86,13 +86,13 @@ const ResponderGraph = ({ incidents, teams }: { incidents: Incident[], teams: Te
     });
 
     return (
-        <div id="weekly-incidents-responders" style={{ width: '100%', height: 300, paddingTop: '1.2rem', paddingRight: '1.2rem' }}>
+        <div id="quarterly-incidents-responders" style={{ width: '100%', height: 300, paddingTop: '1.2rem', paddingRight: '1.2rem' }}>
             <ResponsiveContainer>
                 <ComposedChart
                     data={data}
                 >
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="week" />
+                    <XAxis dataKey="quarter" />
                     <YAxis />
                     {Object.keys(respondersMap).map(responder => (
                         <Bar dataKey={responder} fill={stc(responder)} stackId="a" barSize={30} />
@@ -105,7 +105,7 @@ const ResponderGraph = ({ incidents, teams }: { incidents: Incident[], teams: Te
     );
 };
 
-export const WeeklyIncidentsResponders = () => {
+export const QuarterlyIncidentsResponders = () => {
     const opsgenieApi = useApi(opsgenieApiRef);
     const { value, loading, error } = useAsync(async () => {
         return Promise.all([
@@ -125,7 +125,7 @@ export const WeeklyIncidentsResponders = () => {
     }
 
     const onExport = () => {
-        exportGraph("weekly-incidents-responders");
+        exportGraph("quarterly-incidents-responders");
     };
 
     const action = (
@@ -134,7 +134,7 @@ export const WeeklyIncidentsResponders = () => {
         </IconButton>
     );
     return (
-        <InfoCard title="Incidents by week and responder" action={action}>
+        <InfoCard title="Incidents by quarter and responder" action={action}>
             <ResponderGraph incidents={value![0]} teams={value![1]} />
         </InfoCard>
     );

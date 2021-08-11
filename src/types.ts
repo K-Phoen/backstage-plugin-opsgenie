@@ -49,3 +49,9 @@ export interface Schedule {
   enabled: boolean;
   ownerTeam: TeamRef;
 }
+
+
+export interface Team {
+  id: string; // UUID
+  name: string; // TeamName
+}

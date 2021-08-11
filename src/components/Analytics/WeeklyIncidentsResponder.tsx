@@ -3,18 +3,18 @@ import moment from "moment"
 import { IconButton } from '@material-ui/core';
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
 import {
-    ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Legend
+    ComposedChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Legend
 } from 'recharts';
 import { InfoCard, Progress } from '@backstage/core-components';
 import { useApi } from '@backstage/core-plugin-api';
 import { opsgenieApiRef } from '../../api';
 import { useAsync } from 'react-use';
 import { Alert } from '@material-ui/lab';
-import { Incident } from '../../types';
+import { Incident, Team } from '../../types';
 import { exportGraph, respondingTeam, stringToColour } from './utils';
 
 
-const ResponderGraph = ({ incidents }: { incidents: Incident[] }) => {
+const ResponderGraph = ({ incidents, teams }: { incidents: Incident[], teams: Team[] }) => {
     const incidentsBuckets: Record<string, { responders: Record<string, number>, date: moment.Moment }> = {};
     const respondersMap: Record<string, boolean> = {};
 
@@ -32,7 +32,7 @@ const ResponderGraph = ({ incidents }: { incidents: Incident[] }) => {
             };
         }
 
-        const responder = respondingTeam(incident);
+        const responder = respondingTeam(teams, incident);
 
         respondersMap[responder] = true;
 
@@ -107,7 +107,12 @@ const ResponderGraph = ({ incidents }: { incidents: Incident[] }) => {
 
 export const WeeklyIncidentsResponders = () => {
     const opsgenieApi = useApi(opsgenieApiRef);
-    const { value, loading, error } = useAsync(async () => await opsgenieApi.getIncidents({ limit: 100 }));
+    const { value, loading, error } = useAsync(async () => {
+        return Promise.all([
+            await opsgenieApi.getIncidents({ limit: 100 }),
+            await opsgenieApi.getTeams(),
+        ]);
+    });
 
     if (loading) {
         return <Progress />;
@@ -130,7 +135,7 @@ export const WeeklyIncidentsResponders = () => {
     );
     return (
         <InfoCard title="Incidents by week and responder" action={action}>
-            <ResponderGraph incidents={value!} />
+            <ResponderGraph incidents={value![0]} teams={value![1]} />
         </InfoCard>
     );
 };

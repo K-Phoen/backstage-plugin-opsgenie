@@ -1,102 +1,33 @@
 import React from 'react';
-import moment from "moment"
-import { IconButton } from '@material-ui/core';
-import SaveAltIcon from '@material-ui/icons/SaveAlt';
 import {
     ComposedChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Legend
 } from 'recharts';
 import { InfoCard, Progress } from '@backstage/core-components';
 import { useApi } from '@backstage/core-plugin-api';
-import { opsgenieApiRef } from '../../api';
 import { useAsync } from 'react-use';
 import { Alert } from '@material-ui/lab';
-import { Incident } from '../../types';
-import { exportGraph } from './utils';
+import { analyticsApiRef } from '../../analytics';
+import { SaveAction } from './SaveAction';
 
-const SeverityGraph = ({ incidents }: { incidents: Incident[] }) => {
-    const incidentsBuckets: Record<string, { p1: number, p2: number, p3: number, p4: number, p5: number, date: moment.Moment }> = {};
+const Graph = () => {
+    const analyticsApi = useApi(analyticsApiRef);
+    const { value: dataPoints, loading, error } = useAsync(async () => await analyticsApi.incidentsByWeekAndSeverity());
 
-    let minDate: moment.Moment = moment().startOf('isoWeek');
-    let maxDate: moment.Moment = moment().startOf('isoWeek');
-
-    incidents.forEach((incident) => {
-        const incidentDate = moment(incident.impactStartDate);
-        const week = `w${incidentDate.isoWeek()} - ${incidentDate.year()}`;
-
-        if (!incidentsBuckets[week]) {
-            incidentsBuckets[week] = {
-                p1: 0,
-                p2: 0,
-                p3: 0,
-                p4: 0,
-                p5: 0,
-                date: incidentDate,
-            };
-        }
-
-        if (incident.priority == 'P1') {
-            incidentsBuckets[week].p1 += 1;
-        } else if (incident.priority == 'P2') {
-            incidentsBuckets[week].p2 += 1;
-        } else if (incident.priority == 'P3') {
-            incidentsBuckets[week].p3 += 1;
-        } else if (incident.priority == 'P4') {
-            incidentsBuckets[week].p4 += 1;
-        } else if (incident.priority == 'P5') {
-            incidentsBuckets[week].p5 += 1;
-        }
-
-        if (incidentDate < minDate) {
-            minDate = incidentDate.clone().startOf('isoWeek');
-        }
-    });
-
-    // add empty buckets for weeks with no incident
-    while (minDate <= maxDate) {
-        const week = `w${minDate.isoWeek()} - ${minDate.year()}`;
-
-        if (!incidentsBuckets[week]) {
-            incidentsBuckets[week] = {
-                p1: 0,
-                p2: 0,
-                p3: 0,
-                p4: 0,
-                p5: 0,
-                date: minDate.clone(),
-            };
-        }
-
-        minDate.add(1, 'weeks');
+    if (loading) {
+        return <Progress />;
+    } else if (error) {
+        return (
+            <Alert data-testid="error-message" severity="error">
+                {error.message}
+            </Alert>
+        );
     }
-
-    const data = Object.keys(incidentsBuckets).map(week => (
-        {
-            week: week,
-            p1: incidentsBuckets[week].p1,
-            p2: incidentsBuckets[week].p2,
-            p3: incidentsBuckets[week].p3,
-            p4: incidentsBuckets[week].p4,
-            p5: incidentsBuckets[week].p5,
-            date: incidentsBuckets[week].date,
-        }
-    ));
-
-    data.sort((a, b) => {
-        if (a.date < b.date) {
-            return -1;
-        }
-        if (a.date > b.date) {
-            return 1;
-        }
-
-        return 0;
-    });
 
     return (
         <div id="weekly-incidents-severity" style={{ width: '100%', height: 300, paddingTop: '1.2rem', paddingRight: '1.2rem' }}>
             <ResponsiveContainer>
                 <ComposedChart
-                    data={data}
+                    data={dataPoints}
                 >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="week" />
@@ -115,31 +46,9 @@ const SeverityGraph = ({ incidents }: { incidents: Incident[] }) => {
 };
 
 export const WeeklyIncidentsSeverity = () => {
-    const opsgenieApi = useApi(opsgenieApiRef);
-    const { value, loading, error } = useAsync(async () => await opsgenieApi.getIncidents({ limit: 100 }));
-
-    if (loading) {
-        return <Progress />;
-    } else if (error) {
-        return (
-            <Alert data-testid="error-message" severity="error">
-                {error.message}
-            </Alert>
-        );
-    }
-
-    const onExport = () => {
-        exportGraph("weekly-incidents-severity");
-    };
-
-    const action = (
-        <IconButton aria-label="save" title="Save as image" onClick={onExport}>
-            <SaveAltIcon />
-        </IconButton>
-    );
     return (
-        <InfoCard title="Incidents by week and severity" action={action}>
-            <SeverityGraph incidents={value!} />
+        <InfoCard title="Incidents by week and severity" action={<SaveAction targetRef="weekly-incidents-severity" />}>
+            <Graph />
         </InfoCard>
     );
 };

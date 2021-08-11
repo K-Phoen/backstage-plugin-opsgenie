@@ -50,7 +50,6 @@ export interface Schedule {
   ownerTeam: TeamRef;
 }
 
-
 export interface Team {
   id: string; // UUID
   name: string; // TeamName

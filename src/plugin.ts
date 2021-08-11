@@ -7,6 +7,7 @@ import {
   discoveryApiRef,
   identityApiRef,
 } from '@backstage/core-plugin-api';
+import { AnalitycsApi, analyticsApiRef } from './analytics';
 
 export const opsgenieRouteRef = createRouteRef({
   title: 'opsgenie',
@@ -25,6 +26,14 @@ export const opsGeniePlugin = createPlugin({
           domain: configApi.getString('opsgenie.domain'),
           proxyPath: configApi.getOptionalString('opsgenie.proxyPath'),
         });
+      },
+    }),
+
+    createApiFactory({
+      api: analyticsApiRef,
+      deps: { opsgenieApi: opsgenieApiRef },
+      factory: ({ opsgenieApi }) => {
+        return new AnalitycsApi({opsgenieApi: opsgenieApi});
       },
     }),
   ],

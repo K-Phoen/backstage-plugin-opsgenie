@@ -1,6 +1,6 @@
 import { Entity } from '@backstage/catalog-model';
 import { OPSGENIE_ANNOTATION } from './integration';
-import { Alert, Incident, OnCallParticipantRef, Schedule } from './types';
+import { Alert, Incident, OnCallParticipantRef, Schedule, Team } from './types';
 import { createApiRef, DiscoveryApi, IdentityApi } from '@backstage/core-plugin-api';
 
 export const opsgenieApiRef = createApiRef<Opsgenie>({
@@ -33,6 +33,8 @@ export interface Opsgenie {
   getSchedules(): Promise<Schedule[]>;
   getOnCall(scheduleId: string): Promise<OnCallParticipantRef[]>;
 
+  getTeams(): Promise<Team[]>;
+
   getUserDetailsURL(userId: string): string;
 }
 
@@ -52,6 +54,10 @@ interface ScheduleOnCallResponse {
   data: {
     onCallParticipants: OnCallParticipantRef[];
   };
+}
+
+interface TeamsResponse {
+  data: Team[];
 }
 
 const DEFAULT_PROXY_PATH = '/opsgenie/api';
@@ -159,6 +165,13 @@ export class OpsgenieApi implements Opsgenie {
   async getSchedules(): Promise<Schedule[]> {
     const init = await this.addAuthHeaders({});
     const response = await this.fetch<SchedulesResponse>("/v2/schedules", init);
+
+    return response.data;
+  }
+
+  async getTeams(): Promise<Team[]> {
+    const init = await this.addAuthHeaders({});
+    const response = await this.fetch<TeamsResponse>("/v2/teams", init);
 
     return response.data;
   }

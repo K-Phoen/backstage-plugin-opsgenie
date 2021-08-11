@@ -12,5 +12,19 @@ export interface Config {
          * @visibility frontend
          */
         proxyPath?: string;
+
+        /**
+         * Configuration options used to generate analytics graphs
+         * @visibility frontend
+         */
+        analytics?: {
+            /** @visibility frontend */
+            businessHours?: {
+                /** @visibility frontend */
+                start: number; // 24h format
+                /** @visibility frontend */
+                end: number;  // 24h format
+            };
+        };
     }
 }

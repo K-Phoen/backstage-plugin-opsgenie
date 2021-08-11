@@ -54,6 +54,11 @@ interface DateSortable {
   date: moment.Moment;
 }
 
+export interface HourlyIncidents {
+  hour: string;
+  total: number;
+}
+
 export interface WeeklyIncidentsBySeverity {
   week: string;
   p1: number;
@@ -83,6 +88,7 @@ export interface QuarterlyIncidentsByResponders {
 }
 
 export interface Analytics {
+  incidentsByHour(): Promise<HourlyIncidents[]>;
   incidentsByWeekAndHours(): Promise<WeeklyIncidentsByHour[]>;
   incidentsByWeekAndSeverity(): Promise<WeeklyIncidentsBySeverity[]>;
   incidentsByWeekAndResponder(): Promise<WeeklyIncidentsByResponders>;
@@ -101,6 +107,33 @@ export class AnalitycsApi implements Analytics {
   constructor(opts: { opsgenieApi: Opsgenie, businessHours: BusinessHours }) {
     this.opsgenieApi = opts.opsgenieApi;
     this.businessHours = opts.businessHours;
+  }
+
+  async incidentsByHour(): Promise<HourlyIncidents[]> {
+    const incidents = await this.opsgenieApi.getIncidents({ limit: 100 });
+    const incidentsBuckets: Record<string, number> = {};
+
+    // add empty buckets for hours with no incident
+    for (let h = 0; h < 23; h++) {
+      incidentsBuckets[h] = 0;
+    }
+
+    incidents.forEach((incident) => {
+      const incidentDate = moment(incident.impactStartDate);
+
+      incidentsBuckets[incidentDate.hour()] += 1;
+    });
+
+    const data = Object.keys(incidentsBuckets).map(hour => (
+      {
+        hour: hour,
+        total: incidentsBuckets[hour],
+      }
+    ));
+
+    data.sort((a, b) => parseInt(a.hour, 10) - parseInt(b.hour, 10));
+
+    return data;
   }
 
   async incidentsByWeekAndSeverity(): Promise<WeeklyIncidentsBySeverity[]> {

@@ -26,9 +26,7 @@ const Graph = () => {
     return (
         <div id="weekly-incidents-severity" style={{ width: '100%', height: 300, paddingTop: '1.2rem', paddingRight: '1.2rem' }}>
             <ResponsiveContainer>
-                <ComposedChart
-                    data={dataPoints}
-                >
+                <ComposedChart data={dataPoints}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="week" />
                     <YAxis />

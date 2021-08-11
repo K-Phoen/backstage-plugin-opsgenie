@@ -4,6 +4,7 @@ import { WeeklyIncidents } from './WeeklyIncidents';
 import { WeeklyIncidentsSeverity } from './WeeklyIncidentsSeverity';
 import { WeeklyIncidentsResponders } from './WeeklyIncidentsResponder';
 import { QuarterlyIncidentsResponders } from './QuarterlyIncidentsResponder';
+import { HourlyIncidents } from './HourlyIncidents';
 
 export const Analytics = () => {
     return (
@@ -22,6 +23,10 @@ export const Analytics = () => {
 
             <Grid item md={6} xs={12}>
                 <QuarterlyIncidentsResponders />
+            </Grid>
+
+            <Grid item md={6} xs={12}>
+                <HourlyIncidents />
             </Grid>
         </Grid>
     );

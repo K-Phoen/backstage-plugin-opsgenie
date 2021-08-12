@@ -76,7 +76,7 @@ interface WeeklyIncidentsByHour {
   date: moment.Moment;
 }
 
-interface IncidentsByResponders {
+export interface IncidentsByResponders {
   dataPoints: { period: string; total: number; date: moment.Moment }[]
   responders: string[];
 }

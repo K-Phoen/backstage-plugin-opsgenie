@@ -339,7 +339,7 @@ export class AnalitycsApi implements Analytics {
   }
 
   incidentsByWeekAndResponder(context: Context): IncidentsByResponders {
-    const incidentsBuckets: Record<string, { responders: Record<string, number>, date: moment.Moment }> = {};
+    const incidentsBuckets: Record<string, { responders: Record<string, number>, total: number, date: moment.Moment }> = {};
     const respondersMap: Record<string, boolean> = {};
 
     const minDate = context.from.clone().startOf('isoWeek');
@@ -352,6 +352,7 @@ export class AnalitycsApi implements Analytics {
       if (!incidentsBuckets[week]) {
         incidentsBuckets[week] = {
           responders: {},
+          total: 0,
           date: minDate.clone(),
         };
       }
@@ -371,11 +372,13 @@ export class AnalitycsApi implements Analytics {
       }
 
       incidentsBuckets[week].responders[responder] += 1;
+      incidentsBuckets[week].total += 1;
     });
 
     const data = Object.keys(incidentsBuckets).map(week => {
       const dataPoint: any = {
         period: week,
+        total: incidentsBuckets[week].total,
         date: incidentsBuckets[week].date,
       };
 

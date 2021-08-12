@@ -2,27 +2,15 @@ import React from 'react';
 import {
     ComposedChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Legend, Line
 } from 'recharts';
-import { InfoCard, Progress } from '@backstage/core-components';
+import { InfoCard } from '@backstage/core-components';
 import { useApi } from '@backstage/core-plugin-api';
-import { useAsync } from 'react-use';
-import { Alert } from '@material-ui/lab';
 import stc from 'string-to-color';
-import { analyticsApiRef } from '../../analytics';
+import { analyticsApiRef, Context } from '../../analytics';
 import { SaveAction } from './SaveAction';
 
-const ResponderGraph = () => {
+const ResponderGraph = ({context}: {context: Context}) => {
     const analyticsApi = useApi(analyticsApiRef);
-    const { value: data, loading, error } = useAsync(async () => await analyticsApi.incidentsByMonthAndResponder());
-
-    if (loading) {
-        return <Progress />;
-    } else if (error) {
-        return (
-            <Alert data-testid="error-message" severity="error">
-                {error.message}
-            </Alert>
-        );
-    }
+    const data = analyticsApi.incidentsByMonthAndResponder(context);
 
     return (
         <div id="monthly-incidents-responders" style={{ width: '100%', height: 300, paddingTop: '1.2rem', paddingRight: '1.2rem' }}>
@@ -43,10 +31,10 @@ const ResponderGraph = () => {
     );
 };
 
-export const MonthlyIncidentsResponders = () => {
+export const MonthlyIncidentsResponders = ({context}: {context: Context}) => {
     return (
         <InfoCard title="Incidents by month and responder" action={<SaveAction targetRef="monthly-incidents-responders" />}>
-            <ResponderGraph />
+            <ResponderGraph context={context} />
         </InfoCard>
     );
 };

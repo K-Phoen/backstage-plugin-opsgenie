@@ -1,5 +1,4 @@
 import { createApiRef } from '@backstage/core-plugin-api';
-import { Opsgenie } from './api';
 import moment from 'moment';
 import { Incident, Team } from './types';
 
@@ -54,12 +53,12 @@ interface DateSortable {
   date: moment.Moment;
 }
 
-export interface HourlyIncidents {
+interface HourlyIncidents {
   hour: string;
   total: number;
 }
 
-export interface WeeklyIncidentsBySeverity {
+interface WeeklyIncidentsBySeverity {
   week: string;
   p1: number;
   p2: number;
@@ -69,7 +68,7 @@ export interface WeeklyIncidentsBySeverity {
   date: moment.Moment;
 }
 
-export interface WeeklyIncidentsByHour {
+interface WeeklyIncidentsByHour {
   week: string;
   businessHours: number;
   onCallHours: number;
@@ -77,29 +76,25 @@ export interface WeeklyIncidentsByHour {
   date: moment.Moment;
 }
 
-export interface IncidentsByResponders {
+interface IncidentsByResponders {
   dataPoints: { period: string; total: number; date: moment.Moment }[]
   responders: string[];
 }
 
-export interface QuarterlyIncidentsByResponders {
-  dataPoints: { quarter: string; total: number, date: moment.Moment }[]
-  responders: string[];
-}
-
-interface Incidents {
-  incidents: Incident[]
+export interface Context {
   from: moment.Moment;
   to: moment.Moment;
+  incidents: Incident[];
+  teams: Team[];
 }
 
 export interface Analytics {
-  incidentsByHour(): Promise<HourlyIncidents[]>;
-  incidentsByWeekAndHours(): Promise<WeeklyIncidentsByHour[]>;
-  incidentsByWeekAndSeverity(): Promise<WeeklyIncidentsBySeverity[]>;
-  incidentsByWeekAndResponder(): Promise<IncidentsByResponders>;
-  incidentsByMonthAndResponder(): Promise<IncidentsByResponders>;
-  incidentsByQuarterAndResponder(): Promise<QuarterlyIncidentsByResponders>;
+  incidentsByHour(context: Context): HourlyIncidents[];
+  incidentsByWeekAndHours(context: Context): WeeklyIncidentsByHour[];
+  incidentsByWeekAndSeverity(context: Context): WeeklyIncidentsBySeverity[];
+  incidentsByWeekAndResponder(context: Context): IncidentsByResponders;
+  incidentsByMonthAndResponder(context: Context): IncidentsByResponders;
+  incidentsByQuarterAndResponder(context: Context): IncidentsByResponders;
 }
 
 interface BusinessHours {
@@ -108,32 +103,13 @@ interface BusinessHours {
 }
 
 export class AnalitycsApi implements Analytics {
-  private readonly opsgenieApi: Opsgenie;
   private readonly businessHours: BusinessHours;
 
-  constructor(opts: { opsgenieApi: Opsgenie, businessHours: BusinessHours }) {
-    this.opsgenieApi = opts.opsgenieApi;
+  constructor(opts: { businessHours: BusinessHours }) {
     this.businessHours = opts.businessHours;
   }
 
-  async incidents(): Promise<Incidents> {
-    const from = moment().subtract(1, 'year').startOf('quarter');
-    const to = moment();
-
-    const results = await this.opsgenieApi.getIncidents({
-      limit: 100,
-      query: `createdAt < ${to.valueOf()} AND createdAt > ${from.valueOf()}`
-    });
-
-    return {
-      incidents: results.filter(incident => moment(incident.impactStartDate).isAfter(from)),
-      from: from,
-      to: to,
-    };
-  }
-
-  async incidentsByHour(): Promise<HourlyIncidents[]> {
-    const {incidents} = await this.incidents();
+  incidentsByHour(context: Context): HourlyIncidents[] {
     const incidentsBuckets: Record<string, number> = {};
 
     // add empty buckets for hours with no incident
@@ -141,7 +117,7 @@ export class AnalitycsApi implements Analytics {
       incidentsBuckets[h] = 0;
     }
 
-    incidents.forEach(incident => {
+    context.incidents.forEach(incident => {
       const incidentDate = moment(incident.impactStartDate);
 
       incidentsBuckets[incidentDate.hour()] += 1;
@@ -159,12 +135,11 @@ export class AnalitycsApi implements Analytics {
     return data;
   }
 
-  async incidentsByWeekAndSeverity(): Promise<WeeklyIncidentsBySeverity[]> {
-    const {incidents, from, to} = await this.incidents();
+  incidentsByWeekAndSeverity(context: Context): WeeklyIncidentsBySeverity[] {
     const incidentsBuckets: Record<string, { p1: number, p2: number, p3: number, p4: number, p5: number, date: moment.Moment }> = {};
 
-    const minDate = from.startOf('isoWeek');
-    const maxDate = to.startOf('isoWeek');
+    const minDate = context.from.clone().startOf('isoWeek');
+    const maxDate = context.to.clone().startOf('isoWeek');
 
     // add empty buckets for weeks with no incident
     while (minDate <= maxDate) {
@@ -184,7 +159,7 @@ export class AnalitycsApi implements Analytics {
       minDate.add(1, 'weeks');
     }
 
-    incidents.forEach(incident => {
+    context.incidents.forEach(incident => {
       const incidentDate = moment(incident.impactStartDate);
       const week = `w${incidentDate.isoWeek()} - ${incidentDate.year()}`;
 
@@ -218,12 +193,11 @@ export class AnalitycsApi implements Analytics {
     return data;
   }
 
-  async incidentsByWeekAndHours(): Promise<WeeklyIncidentsByHour[]> {
-    const {incidents, from, to} = await this.incidents();
+  incidentsByWeekAndHours(context: Context): WeeklyIncidentsByHour[] {
     const incidentsBuckets: Record<string, { businessHours: number, onCallHours: number, total: number, date: moment.Moment }> = {};
 
-    const minDate = from.startOf('isoWeek');
-    const maxDate = to.startOf('isoWeek');
+    const minDate = context.from.clone().startOf('isoWeek');
+    const maxDate = context.to.clone().startOf('isoWeek');
 
     // add empty buckets for weeks with no incident
     while (minDate <= maxDate) {
@@ -241,7 +215,7 @@ export class AnalitycsApi implements Analytics {
       minDate.add(1, 'weeks');
     }
 
-    incidents.forEach(incident => {
+    context.incidents.forEach(incident => {
       const incidentDate = moment(incident.impactStartDate);
       const week = `w${incidentDate.isoWeek()} - ${incidentDate.year()}`;
 
@@ -269,12 +243,12 @@ export class AnalitycsApi implements Analytics {
     return data;
   }
 
-  async incidentsByMonthAndResponder(): Promise<IncidentsByResponders> {
-    const {incidents, from, to} = await this.incidents();
-    const teams = await this.opsgenieApi.getTeams();
-
+  incidentsByMonthAndResponder(context: Context): IncidentsByResponders {
     const incidentsBuckets: Record<string, { responders: Record<string, number>, total: number, date: moment.Moment }> = {};
     const respondersMap: Record<string, boolean> = {};
+
+    const from = context.from.clone();
+    const to = context.to.clone();
 
     // add empty buckets for months with no incident
     while (from <= to) {
@@ -291,10 +265,10 @@ export class AnalitycsApi implements Analytics {
       from.add(1, 'month');
     }
 
-    incidents.forEach(incident => {
+    context.incidents.forEach(incident => {
       const incidentDate = moment(incident.impactStartDate);
       const month = `${incidentDate.month() + 1}/${incidentDate.year()}`;
-      const responder = respondingTeam(teams, incident);
+      const responder = respondingTeam(context.teams, incident);
 
       respondersMap[responder] = true;
 
@@ -328,15 +302,12 @@ export class AnalitycsApi implements Analytics {
     };
   }
 
-  async incidentsByWeekAndResponder(): Promise<IncidentsByResponders> {
-    const {incidents, from, to} = await this.incidents();
-    const teams = await this.opsgenieApi.getTeams();
-
+  incidentsByWeekAndResponder(context: Context): IncidentsByResponders {
     const incidentsBuckets: Record<string, { responders: Record<string, number>, date: moment.Moment }> = {};
     const respondersMap: Record<string, boolean> = {};
 
-    const minDate = from.startOf('isoWeek');
-    const maxDate = to.startOf('isoWeek');
+    const minDate = context.from.clone().startOf('isoWeek');
+    const maxDate = context.to.clone().startOf('isoWeek');
 
     // add empty buckets for weeks with no incident
     while (minDate <= maxDate) {
@@ -352,10 +323,10 @@ export class AnalitycsApi implements Analytics {
       minDate.add(1, 'weeks');
     }
 
-    incidents.forEach(incident => {
+    context.incidents.forEach(incident => {
       const incidentDate = moment(incident.impactStartDate);
       const week = `w${incidentDate.isoWeek()} - ${incidentDate.year()}`;
-      const responder = respondingTeam(teams, incident);
+      const responder = respondingTeam(context.teams, incident);
 
       respondersMap[responder] = true;
 
@@ -387,12 +358,12 @@ export class AnalitycsApi implements Analytics {
     };
   }
 
-  async incidentsByQuarterAndResponder(): Promise<QuarterlyIncidentsByResponders> {
-    const {incidents, from, to} = await this.incidents();
-    const teams = await this.opsgenieApi.getTeams();
-
+  incidentsByQuarterAndResponder(context: Context): IncidentsByResponders {
     const incidentsBuckets: Record<string, { responders: Record<string, number>, total: number, date: moment.Moment }> = {};
     const respondersMap: Record<string, boolean> = {};
+
+    const from = context.from.clone();
+    const to = context.to.clone();
 
     // add empty buckets for quarters with no incident (let's be hopeful, might happen)
     while (from <= to) {
@@ -409,10 +380,10 @@ export class AnalitycsApi implements Analytics {
       from.add(1, 'weeks');
     }
 
-    incidents.forEach(incident => {
+    context.incidents.forEach(incident => {
       const incidentDate = moment(incident.impactStartDate);
       const quarter = `Q${incidentDate.quarter()} - ${incidentDate.year()}`;
-      const responder = respondingTeam(teams, incident);
+      const responder = respondingTeam(context.teams, incident);
 
       respondersMap[responder] = true;
 
@@ -426,7 +397,7 @@ export class AnalitycsApi implements Analytics {
 
     const data = Object.keys(incidentsBuckets).map(quarter => {
       const dataPoint: any = {
-        quarter: quarter,
+        period: quarter,
         total:incidentsBuckets[quarter].total,
         date: incidentsBuckets[quarter].date,
       };

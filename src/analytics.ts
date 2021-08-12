@@ -87,6 +87,12 @@ export interface QuarterlyIncidentsByResponders {
   responders: string[];
 }
 
+interface Incidents {
+  incidents: Incident[]
+  from: moment.Moment;
+  to: moment.Moment;
+}
+
 export interface Analytics {
   incidentsByHour(): Promise<HourlyIncidents[]>;
   incidentsByWeekAndHours(): Promise<WeeklyIncidentsByHour[]>;
@@ -109,8 +115,24 @@ export class AnalitycsApi implements Analytics {
     this.businessHours = opts.businessHours;
   }
 
+  async incidents(): Promise<Incidents> {
+    const from = moment().subtract(1, 'year').startOf('quarter');
+    const to = moment();
+
+    const results = await this.opsgenieApi.getIncidents({
+      limit: 100,
+      query: `createdAt < ${to.valueOf()} AND createdAt > ${from.valueOf()}`
+    });
+
+    return {
+      incidents: results.filter(incident => moment(incident.impactStartDate).isAfter(from)),
+      from: from,
+      to: to,
+    };
+  }
+
   async incidentsByHour(): Promise<HourlyIncidents[]> {
-    const incidents = await this.opsgenieApi.getIncidents({ limit: 100 });
+    const {incidents} = await this.incidents();
     const incidentsBuckets: Record<string, number> = {};
 
     // add empty buckets for hours with no incident
@@ -137,12 +159,11 @@ export class AnalitycsApi implements Analytics {
   }
 
   async incidentsByWeekAndSeverity(): Promise<WeeklyIncidentsBySeverity[]> {
-    const incidents = await this.opsgenieApi.getIncidents({ limit: 100 });
-
+    const {incidents, from, to} = await this.incidents();
     const incidentsBuckets: Record<string, { p1: number, p2: number, p3: number, p4: number, p5: number, date: moment.Moment }> = {};
 
-    let minDate: moment.Moment = moment().startOf('isoWeek');
-    const maxDate: moment.Moment = moment().startOf('isoWeek');
+    const minDate = from.startOf('isoWeek');
+    const maxDate = to.startOf('isoWeek');
 
     incidents.forEach((incident) => {
       const incidentDate = moment(incident.impactStartDate);
@@ -169,10 +190,6 @@ export class AnalitycsApi implements Analytics {
         incidentsBuckets[week].p4 += 1;
       } else if (incident.priority === 'P5') {
         incidentsBuckets[week].p5 += 1;
-      }
-
-      if (incidentDate < minDate) {
-        minDate = incidentDate.clone().startOf('isoWeek');
       }
     });
 
@@ -212,11 +229,11 @@ export class AnalitycsApi implements Analytics {
   }
 
   async incidentsByWeekAndHours(): Promise<WeeklyIncidentsByHour[]> {
-    const incidents = await this.opsgenieApi.getIncidents({ limit: 100 });
+    const {incidents, from, to} = await this.incidents();
     const incidentsBuckets: Record<string, { businessHours: number, onCallHours: number, total: number, date: moment.Moment }> = {};
 
-    let minDate: moment.Moment = moment().startOf('isoWeek');
-    const maxDate: moment.Moment = moment().startOf('isoWeek');
+    const minDate = from.startOf('isoWeek');
+    const maxDate = to.startOf('isoWeek');
 
     incidents.forEach((incident) => {
       const incidentDate = moment(incident.impactStartDate);
@@ -236,10 +253,6 @@ export class AnalitycsApi implements Analytics {
         incidentsBuckets[week].businessHours += 1;
       } else {
         incidentsBuckets[week].onCallHours += 1;
-      }
-
-      if (incidentDate < minDate) {
-        minDate = incidentDate.clone().startOf('isoWeek');
       }
     });
 
@@ -275,14 +288,14 @@ export class AnalitycsApi implements Analytics {
   }
 
   async incidentsByWeekAndResponder(): Promise<WeeklyIncidentsByResponders> {
-    const incidents = await this.opsgenieApi.getIncidents({ limit: 100 });
+    const {incidents, from, to} = await this.incidents();
     const teams = await this.opsgenieApi.getTeams();
 
     const incidentsBuckets: Record<string, { responders: Record<string, number>, date: moment.Moment }> = {};
     const respondersMap: Record<string, boolean> = {};
 
-    let minDate: moment.Moment = moment().startOf('isoWeek');
-    const maxDate: moment.Moment = moment().startOf('isoWeek');
+    const minDate = from.startOf('isoWeek');
+    const maxDate = to.startOf('isoWeek');
 
     incidents.forEach((incident) => {
       const incidentDate = moment(incident.impactStartDate);
@@ -304,10 +317,6 @@ export class AnalitycsApi implements Analytics {
       }
 
       incidentsBuckets[week].responders[responder] += 1;
-
-      if (incidentDate < minDate) {
-        minDate = incidentDate.clone().startOf('isoWeek');
-      }
     });
 
     // add empty buckets for weeks with no incident
@@ -346,14 +355,14 @@ export class AnalitycsApi implements Analytics {
   }
 
   async incidentsByQuarterAndResponder(): Promise<QuarterlyIncidentsByResponders> {
-    const incidents = await this.opsgenieApi.getIncidents({ limit: 100 });
+    const {incidents, from, to} = await this.incidents();
     const teams = await this.opsgenieApi.getTeams();
 
     const incidentsBuckets: Record<string, { responders: Record<string, number>, date: moment.Moment }> = {};
     const respondersMap: Record<string, boolean> = {};
 
-    let minDate: moment.Moment = moment().startOf('isoWeek');
-    const maxDate: moment.Moment = moment().startOf('isoWeek');
+    const minDate = from.startOf('isoWeek');
+    const maxDate = to.startOf('isoWeek');
 
     incidents.forEach((incident) => {
       const incidentDate = moment(incident.impactStartDate);
@@ -375,10 +384,6 @@ export class AnalitycsApi implements Analytics {
       }
 
       incidentsBuckets[quarter].responders[responder] += 1;
-
-      if (incidentDate < minDate) {
-        minDate = incidentDate.clone().startOf('isoWeek');
-      }
     });
 
     // add empty buckets for quarters with no incident (let's be hopeful, might happen)

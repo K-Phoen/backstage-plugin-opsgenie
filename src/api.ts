@@ -14,6 +14,7 @@ type AlertsFetchOpts = {
 
 type IncidentsFetchOpts = {
   limit?: number
+  query?: string;
   sort?: string;
   order?: string;
 }
@@ -44,6 +45,11 @@ interface AlertsResponse {
 
 interface IncidentsResponse {
   data: Incident[];
+  paging: {
+    first: string;
+    next?: string;
+    last: string;
+  };
 }
 
 interface SchedulesResponse {
@@ -96,8 +102,9 @@ export class OpsgenieApi implements Opsgenie {
 
   private async fetch<T = any>(input: string, init?: RequestInit): Promise<T> {
     const apiUrl = await this.apiUrl();
+    const authedInit = await this.addAuthHeaders(init || {});
 
-    const resp = await fetch(`${apiUrl}${input}`, init);
+    const resp = await fetch(`${apiUrl}${input}`, authedInit);
     if (!resp.ok) {
       throw new Error(`Request failed with ${resp.status} ${resp.statusText}`);
     }
@@ -107,16 +114,15 @@ export class OpsgenieApi implements Opsgenie {
 
   private async call(input: string, init?: RequestInit): Promise<void> {
     const apiUrl = await this.apiUrl();
+    const authedInit = await this.addAuthHeaders(init || {});
 
-    const resp = await fetch(`${apiUrl}${input}`, init);
+    const resp = await fetch(`${apiUrl}${input}`, authedInit);
     if (!resp.ok) throw new Error(`Request failed with ${resp.status}: ${resp.statusText}`);
   }
 
   async getAlerts(opts?: AlertsFetchOpts): Promise<Alert[]> {
     const limit = opts?.limit || 50;
-    const init = await this.addAuthHeaders({});
-
-    const response = await this.fetch<AlertsResponse>(`/v2/alerts?limit=${limit}`, init);
+    const response = await this.fetch<AlertsResponse>(`/v2/alerts?limit=${limit}`);
 
     return response.data;
   }
@@ -125,60 +131,64 @@ export class OpsgenieApi implements Opsgenie {
     const limit = opts?.limit || 50;
     const sort = opts?.sort || 'createdAt';
     const order = opts?.order || 'desc';
-    const init = await this.addAuthHeaders({});
+    const query = opts?.query ? `&query=${opts?.query}` : '';
 
-    const response = await this.fetch<IncidentsResponse>(`/v1/incidents?limit=${limit}&sort=${sort}&order=${order}`, init);
+    let response = await this.fetch<IncidentsResponse>(`/v1/incidents?limit=${limit}&sort=${sort}&order=${order}${query}`);
+    let incidents = response.data;
 
-    return response.data;
+    while (response.paging.next) {
+      const parsedUrl = new URL(response.paging.next);
+      response = await this.fetch(parsedUrl.pathname + parsedUrl.search);
+
+      incidents = incidents.concat(response.data);
+    }
+
+    return incidents;
   }
 
   async getAlertsForEntity(entity: Entity, opts?: AlertsFetchOpts): Promise<Alert[]> {
     const limit = opts?.limit || 5;
     const query = entity.metadata.annotations?.[OPSGENIE_ANNOTATION];
-    const init = await this.addAuthHeaders({});
 
-    const response = await this.fetch<AlertsResponse>(`/v2/alerts?limit=${limit}&query=${query}`, init);
+    const response = await this.fetch<AlertsResponse>(`/v2/alerts?limit=${limit}&query=${query}`);
 
     return response.data;
   }
 
   async acknowledgeAlert(alert: Alert): Promise<void> {
-    const init = await this.addAuthHeaders({
+    const init = {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({source: 'Backstage — Opsgenie plugin'}),
-    });
+    };
 
     await this.call(`/v2/alerts/${alert.id}/acknowledge`, init);
   }
 
   async closeAlert(alert: Alert): Promise<void> {
-    const init = await this.addAuthHeaders({
+    const init = {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({source: 'Backstage — Opsgenie plugin'}),
-    });
+    };
 
     await this.call(`/v2/alerts/${alert.id}/close`, init);
   }
 
   async getSchedules(): Promise<Schedule[]> {
-    const init = await this.addAuthHeaders({});
-    const response = await this.fetch<SchedulesResponse>("/v2/schedules", init);
+    const response = await this.fetch<SchedulesResponse>("/v2/schedules");
 
     return response.data;
   }
 
   async getTeams(): Promise<Team[]> {
-    const init = await this.addAuthHeaders({});
-    const response = await this.fetch<TeamsResponse>("/v2/teams", init);
+    const response = await this.fetch<TeamsResponse>("/v2/teams");
 
     return response.data;
   }
 
   async getOnCall(scheduleId: string): Promise<OnCallParticipantRef[]> {
-    const init = await this.addAuthHeaders({});
-    const response = await this.fetch<ScheduleOnCallResponse>(`/v2/schedules/${scheduleId}/on-calls`, init);
+    const response = await this.fetch<ScheduleOnCallResponse>(`/v2/schedules/${scheduleId}/on-calls`);
 
     return response.data.onCallParticipants;
   }

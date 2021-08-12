@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-    ComposedChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Legend
+    ComposedChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Legend, Line
 } from 'recharts';
 import { InfoCard, Progress } from '@backstage/core-components';
 import { useApi } from '@backstage/core-plugin-api';
@@ -34,6 +34,7 @@ const ResponderGraph = () => {
                     {data!.responders.map(responder => (
                         <Bar dataKey={responder} fill={stc(responder)} stackId="a" barSize={30}  key={responder} />
                     ))}
+                    <Line type="monotone" dataKey="total" name="Total" stroke="#ff7300" />
                     <Tooltip />
                     <Legend />
                 </ComposedChart>

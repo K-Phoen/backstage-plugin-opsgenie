@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-    ComposedChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Legend
+    ComposedChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Legend, Line
 } from 'recharts';
 import { InfoCard, Progress } from '@backstage/core-components';
 import { useApi } from '@backstage/core-plugin-api';
@@ -12,7 +12,7 @@ import { SaveAction } from './SaveAction';
 
 const ResponderGraph = () => {
     const analyticsApi = useApi(analyticsApiRef);
-    const { value: data, loading, error } = useAsync(async () => await analyticsApi.incidentsByWeekAndResponder());
+    const { value: data, loading, error } = useAsync(async () => await analyticsApi.incidentsByMonthAndResponder());
 
     if (loading) {
         return <Progress />;
@@ -25,7 +25,7 @@ const ResponderGraph = () => {
     }
 
     return (
-        <div id="weekly-incidents-responders" style={{ width: '100%', height: 300, paddingTop: '1.2rem', paddingRight: '1.2rem' }}>
+        <div id="monthly-incidents-responders" style={{ width: '100%', height: 300, paddingTop: '1.2rem', paddingRight: '1.2rem' }}>
             <ResponsiveContainer>
                 <ComposedChart data={data!.dataPoints}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -34,6 +34,7 @@ const ResponderGraph = () => {
                     {data!.responders.map(responder => (
                         <Bar dataKey={responder} fill={stc(responder)} stackId="a" barSize={30}  key={responder} />
                     ))}
+                    <Line type="monotone" dataKey="total" name="Total" stroke="#ff7300" />
                     <Tooltip />
                     <Legend />
                 </ComposedChart>
@@ -42,9 +43,9 @@ const ResponderGraph = () => {
     );
 };
 
-export const WeeklyIncidentsResponders = () => {
+export const MonthlyIncidentsResponders = () => {
     return (
-        <InfoCard title="Incidents by week and responder" action={<SaveAction targetRef="weekly-incidents-responders" />}>
+        <InfoCard title="Incidents by month and responder" action={<SaveAction targetRef="monthly-incidents-responders" />}>
             <ResponderGraph />
         </InfoCard>
     );

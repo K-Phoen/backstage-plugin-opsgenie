@@ -2,26 +2,14 @@ import React from 'react';
 import {
     ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Legend
 } from 'recharts';
-import { InfoCard, Progress } from '@backstage/core-components';
+import { InfoCard } from '@backstage/core-components';
 import { useApi } from '@backstage/core-plugin-api';
-import { useAsync } from 'react-use';
-import { Alert } from '@material-ui/lab';
-import { analyticsApiRef } from '../../analytics';
+import { analyticsApiRef, Context } from '../../analytics';
 import { SaveAction } from './SaveAction';
 
-const Graph = () => {
+const Graph = ({context}: {context: Context}) => {
     const analyticsApi = useApi(analyticsApiRef);
-    const { value: dataPoints, loading, error } = useAsync(async () => await analyticsApi.incidentsByWeekAndHours());
-
-    if (loading) {
-        return <Progress />;
-    } else if (error) {
-        return (
-            <Alert data-testid="error-message" severity="error">
-                {error.message}
-            </Alert>
-        );
-    }
+    const dataPoints = analyticsApi.incidentsByWeekAndHours(context);
 
     return (
         <div id="weekly-incidents" style={{ width: '100%', height: 300, paddingTop: '1.2rem', paddingRight: '1.2rem' }}>
@@ -43,10 +31,10 @@ const Graph = () => {
     );
 };
 
-export const WeeklyIncidents = () => {
+export const WeeklyIncidents = ({context}: {context: Context}) => {
     return (
         <InfoCard title="Incidents by week" action={<SaveAction targetRef="weekly-incidents" />}>
-            <Graph />
+            <Graph context={context} />
         </InfoCard>
     );
 };

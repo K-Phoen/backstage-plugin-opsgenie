@@ -31,10 +31,9 @@ export const opsGeniePlugin = createPlugin({
 
     createApiFactory({
       api: analyticsApiRef,
-      deps: { opsgenieApi: opsgenieApiRef, configApi: configApiRef },
-      factory: ({ opsgenieApi, configApi }) => {
+      deps: { configApi: configApiRef },
+      factory: ({ configApi }) => {
         return new AnalitycsApi({
-          opsgenieApi: opsgenieApi,
           businessHours: {
             start: configApi.getOptionalNumber('opsgenie.analytics.businessHours.start') || DEFAULT_BUSINESS_HOURS_START,
             end: configApi.getOptionalNumber('opsgenie.analytics.businessHours.end') || DEFAULT_BUSINESS_HOURS_END,

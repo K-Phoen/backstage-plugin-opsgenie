@@ -334,21 +334,18 @@ export class AnalitycsApi implements Analytics {
     const incidentsBuckets: Record<string, { responders: Record<string, number>, date: moment.Moment }> = {};
     const respondersMap: Record<string, boolean> = {};
 
-    const minDate = from.startOf('isoWeek');
-    const maxDate = to.startOf('isoWeek');
-
     // add empty buckets for quarters with no incident (let's be hopeful, might happen)
-    while (minDate <= maxDate) {
-      const quarter = `Q${minDate.quarter()} - ${minDate.year()}`;
+    while (from <= to) {
+      const quarter = `Q${from.quarter()} - ${from.year()}`;
 
       if (!incidentsBuckets[quarter]) {
         incidentsBuckets[quarter] = {
           responders: {},
-          date: minDate.clone(),
+          date: from.clone(),
         };
       }
 
-      minDate.add(1, 'weeks');
+      from.add(1, 'weeks');
     }
 
     incidents.forEach(incident => {

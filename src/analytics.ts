@@ -77,8 +77,8 @@ export interface WeeklyIncidentsByHour {
   date: moment.Moment;
 }
 
-export interface WeeklyIncidentsByResponders {
-  dataPoints: { week: string; date: moment.Moment }[]
+export interface IncidentsByResponders {
+  dataPoints: { period: string; total: number; date: moment.Moment }[]
   responders: string[];
 }
 
@@ -97,7 +97,8 @@ export interface Analytics {
   incidentsByHour(): Promise<HourlyIncidents[]>;
   incidentsByWeekAndHours(): Promise<WeeklyIncidentsByHour[]>;
   incidentsByWeekAndSeverity(): Promise<WeeklyIncidentsBySeverity[]>;
-  incidentsByWeekAndResponder(): Promise<WeeklyIncidentsByResponders>;
+  incidentsByWeekAndResponder(): Promise<IncidentsByResponders>;
+  incidentsByMonthAndResponder(): Promise<IncidentsByResponders>;
   incidentsByQuarterAndResponder(): Promise<QuarterlyIncidentsByResponders>;
 }
 
@@ -268,7 +269,66 @@ export class AnalitycsApi implements Analytics {
     return data;
   }
 
-  async incidentsByWeekAndResponder(): Promise<WeeklyIncidentsByResponders> {
+  async incidentsByMonthAndResponder(): Promise<IncidentsByResponders> {
+    const {incidents, from, to} = await this.incidents();
+    const teams = await this.opsgenieApi.getTeams();
+
+    const incidentsBuckets: Record<string, { responders: Record<string, number>, total: number, date: moment.Moment }> = {};
+    const respondersMap: Record<string, boolean> = {};
+
+    // add empty buckets for months with no incident
+    while (from <= to) {
+      const month = `${from.month() + 1}/${from.year()}`;
+
+      if (!incidentsBuckets[month]) {
+        incidentsBuckets[month] = {
+          responders: {},
+          total: 0,
+          date: from.clone(),
+        };
+      }
+
+      from.add(1, 'month');
+    }
+
+    incidents.forEach(incident => {
+      const incidentDate = moment(incident.impactStartDate);
+      const month = `${incidentDate.month() + 1}/${incidentDate.year()}`;
+      const responder = respondingTeam(teams, incident);
+
+      respondersMap[responder] = true;
+
+      if (!incidentsBuckets[month].responders[responder]) {
+        incidentsBuckets[month].responders[responder] = 0;
+      }
+
+      incidentsBuckets[month].responders[responder] += 1;
+      incidentsBuckets[month].total += 1;
+    });
+
+    const data = Object.keys(incidentsBuckets).map(month => {
+      const dataPoint: any = {
+        period: month,
+        total: incidentsBuckets[month].total,
+        date: incidentsBuckets[month].date,
+      };
+
+      Object.keys(respondersMap).forEach(responder => {
+        dataPoint[responder] = incidentsBuckets[month].responders[responder] || 0;
+      });
+
+      return dataPoint;
+    });
+
+    sortByDate(data);
+
+    return {
+      dataPoints: data,
+      responders: Object.keys(respondersMap),
+    };
+  }
+
+  async incidentsByWeekAndResponder(): Promise<IncidentsByResponders> {
     const {incidents, from, to} = await this.incidents();
     const teams = await this.opsgenieApi.getTeams();
 
@@ -308,7 +368,7 @@ export class AnalitycsApi implements Analytics {
 
     const data = Object.keys(incidentsBuckets).map(week => {
       const dataPoint: any = {
-        week: week,
+        period: week,
         date: incidentsBuckets[week].date,
       };
 

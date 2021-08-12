@@ -140,7 +140,7 @@ export class AnalitycsApi implements Analytics {
       incidentsBuckets[h] = 0;
     }
 
-    incidents.forEach((incident) => {
+    incidents.forEach(incident => {
       const incidentDate = moment(incident.impactStartDate);
 
       incidentsBuckets[incidentDate.hour()] += 1;
@@ -165,34 +165,6 @@ export class AnalitycsApi implements Analytics {
     const minDate = from.startOf('isoWeek');
     const maxDate = to.startOf('isoWeek');
 
-    incidents.forEach((incident) => {
-      const incidentDate = moment(incident.impactStartDate);
-      const week = `w${incidentDate.isoWeek()} - ${incidentDate.year()}`;
-
-      if (!incidentsBuckets[week]) {
-        incidentsBuckets[week] = {
-          p1: 0,
-          p2: 0,
-          p3: 0,
-          p4: 0,
-          p5: 0,
-          date: incidentDate,
-        };
-      }
-
-      if (incident.priority === 'P1') {
-        incidentsBuckets[week].p1 += 1;
-      } else if (incident.priority === 'P2') {
-        incidentsBuckets[week].p2 += 1;
-      } else if (incident.priority === 'P3') {
-        incidentsBuckets[week].p3 += 1;
-      } else if (incident.priority === 'P4') {
-        incidentsBuckets[week].p4 += 1;
-      } else if (incident.priority === 'P5') {
-        incidentsBuckets[week].p5 += 1;
-      }
-    });
-
     // add empty buckets for weeks with no incident
     while (minDate <= maxDate) {
       const week = `w${minDate.isoWeek()} - ${minDate.year()}`;
@@ -210,6 +182,23 @@ export class AnalitycsApi implements Analytics {
 
       minDate.add(1, 'weeks');
     }
+
+    incidents.forEach(incident => {
+      const incidentDate = moment(incident.impactStartDate);
+      const week = `w${incidentDate.isoWeek()} - ${incidentDate.year()}`;
+
+      if (incident.priority === 'P1') {
+        incidentsBuckets[week].p1 += 1;
+      } else if (incident.priority === 'P2') {
+        incidentsBuckets[week].p2 += 1;
+      } else if (incident.priority === 'P3') {
+        incidentsBuckets[week].p3 += 1;
+      } else if (incident.priority === 'P4') {
+        incidentsBuckets[week].p4 += 1;
+      } else if (incident.priority === 'P5') {
+        incidentsBuckets[week].p5 += 1;
+      }
+    });
 
     const data = Object.keys(incidentsBuckets).map(week => (
       {
@@ -235,27 +224,6 @@ export class AnalitycsApi implements Analytics {
     const minDate = from.startOf('isoWeek');
     const maxDate = to.startOf('isoWeek');
 
-    incidents.forEach((incident) => {
-      const incidentDate = moment(incident.impactStartDate);
-      const week = `w${incidentDate.isoWeek()} - ${incidentDate.year()}`;
-
-      if (!incidentsBuckets[week]) {
-        incidentsBuckets[week] = {
-          businessHours: 0,
-          onCallHours: 0,
-          total: 0,
-          date: incidentDate,
-        };
-      }
-
-      incidentsBuckets[week].total += 1;
-      if (this.isBusinessHours(incidentDate)) {
-        incidentsBuckets[week].businessHours += 1;
-      } else {
-        incidentsBuckets[week].onCallHours += 1;
-      }
-    });
-
     // add empty buckets for weeks with no incident
     while (minDate <= maxDate) {
       const week = `w${minDate.isoWeek()} - ${minDate.year()}`;
@@ -271,6 +239,19 @@ export class AnalitycsApi implements Analytics {
 
       minDate.add(1, 'weeks');
     }
+
+    incidents.forEach(incident => {
+      const incidentDate = moment(incident.impactStartDate);
+      const week = `w${incidentDate.isoWeek()} - ${incidentDate.year()}`;
+
+      incidentsBuckets[week].total += 1;
+
+      if (this.isBusinessHours(incidentDate)) {
+        incidentsBuckets[week].businessHours += 1;
+      } else {
+        incidentsBuckets[week].onCallHours += 1;
+      }
+    });
 
     const data = Object.keys(incidentsBuckets).map(week => (
       {
@@ -297,28 +278,6 @@ export class AnalitycsApi implements Analytics {
     const minDate = from.startOf('isoWeek');
     const maxDate = to.startOf('isoWeek');
 
-    incidents.forEach((incident) => {
-      const incidentDate = moment(incident.impactStartDate);
-      const week = `w${incidentDate.isoWeek()} - ${incidentDate.year()}`;
-
-      if (!incidentsBuckets[week]) {
-        incidentsBuckets[week] = {
-          responders: {},
-          date: incidentDate,
-        };
-      }
-
-      const responder = respondingTeam(teams, incident);
-
-      respondersMap[responder] = true;
-
-      if (!incidentsBuckets[week].responders[responder]) {
-        incidentsBuckets[week].responders[responder] = 0;
-      }
-
-      incidentsBuckets[week].responders[responder] += 1;
-    });
-
     // add empty buckets for weeks with no incident
     while (minDate <= maxDate) {
       const week = `w${minDate.isoWeek()} - ${minDate.year()}`;
@@ -333,13 +292,27 @@ export class AnalitycsApi implements Analytics {
       minDate.add(1, 'weeks');
     }
 
+    incidents.forEach(incident => {
+      const incidentDate = moment(incident.impactStartDate);
+      const week = `w${incidentDate.isoWeek()} - ${incidentDate.year()}`;
+      const responder = respondingTeam(teams, incident);
+
+      respondersMap[responder] = true;
+
+      if (!incidentsBuckets[week].responders[responder]) {
+        incidentsBuckets[week].responders[responder] = 0;
+      }
+
+      incidentsBuckets[week].responders[responder] += 1;
+    });
+
     const data = Object.keys(incidentsBuckets).map(week => {
       const dataPoint: any = {
         week: week,
         date: incidentsBuckets[week].date,
       };
 
-      Object.keys(respondersMap).forEach((responder) => {
+      Object.keys(respondersMap).forEach(responder => {
         dataPoint[responder] = incidentsBuckets[week].responders[responder] || 0;
       });
 
@@ -364,28 +337,6 @@ export class AnalitycsApi implements Analytics {
     const minDate = from.startOf('isoWeek');
     const maxDate = to.startOf('isoWeek');
 
-    incidents.forEach((incident) => {
-      const incidentDate = moment(incident.impactStartDate);
-      const quarter = `Q${incidentDate.quarter()} - ${incidentDate.year()}`;
-
-      if (!incidentsBuckets[quarter]) {
-        incidentsBuckets[quarter] = {
-          responders: {},
-          date: incidentDate,
-        };
-      }
-
-      const responder = respondingTeam(teams, incident);
-
-      respondersMap[responder] = true;
-
-      if (!incidentsBuckets[quarter].responders[responder]) {
-        incidentsBuckets[quarter].responders[responder] = 0;
-      }
-
-      incidentsBuckets[quarter].responders[responder] += 1;
-    });
-
     // add empty buckets for quarters with no incident (let's be hopeful, might happen)
     while (minDate <= maxDate) {
       const quarter = `Q${minDate.quarter()} - ${minDate.year()}`;
@@ -400,13 +351,27 @@ export class AnalitycsApi implements Analytics {
       minDate.add(1, 'weeks');
     }
 
+    incidents.forEach(incident => {
+      const incidentDate = moment(incident.impactStartDate);
+      const quarter = `Q${incidentDate.quarter()} - ${incidentDate.year()}`;
+      const responder = respondingTeam(teams, incident);
+
+      respondersMap[responder] = true;
+
+      if (!incidentsBuckets[quarter].responders[responder]) {
+        incidentsBuckets[quarter].responders[responder] = 0;
+      }
+
+      incidentsBuckets[quarter].responders[responder] += 1;
+    });
+
     const data = Object.keys(incidentsBuckets).map(quarter => {
       const dataPoint: any = {
         quarter: quarter,
         date: incidentsBuckets[quarter].date,
       };
 
-      Object.keys(respondersMap).forEach((responder) => {
+      Object.keys(respondersMap).forEach(responder => {
         dataPoint[responder] = incidentsBuckets[quarter].responders[responder] || 0;
       });
 

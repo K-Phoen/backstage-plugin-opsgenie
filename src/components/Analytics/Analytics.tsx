@@ -13,6 +13,7 @@ import { useAsync } from 'react-use';
 import { Progress } from '@backstage/core-components';
 import { Alert } from '@material-ui/lab';
 import { Context } from '../../analytics';
+import { DailyIncidents } from './DailyIncidents';
 
 export const Analytics = () => {
     const opsgenieApi = useApi(opsgenieApiRef);
@@ -67,6 +68,10 @@ export const Analytics = () => {
 
             <Grid item md={6} xs={12}>
                 <HourlyIncidents context={context} />
+            </Grid>
+
+            <Grid item md={6} xs={12}>
+                <DailyIncidents context={context} />
             </Grid>
         </Grid>
     );

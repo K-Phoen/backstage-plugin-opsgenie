@@ -58,6 +58,11 @@ interface HourlyIncidents {
   total: number;
 }
 
+interface DailyIncidents {
+  day: string;
+  total: number;
+}
+
 interface WeeklyIncidentsBySeverity {
   week: string;
   p1: number;
@@ -90,8 +95,11 @@ export interface Context {
 
 export interface Analytics {
   incidentsByHour(context: Context): HourlyIncidents[];
+  incidentsByDay(context: Context): DailyIncidents[];
+
   incidentsByWeekAndHours(context: Context): WeeklyIncidentsByHour[];
   incidentsByWeekAndSeverity(context: Context): WeeklyIncidentsBySeverity[];
+
   incidentsByWeekAndResponder(context: Context): IncidentsByResponders;
   incidentsByMonthAndResponder(context: Context): IncidentsByResponders;
   incidentsByQuarterAndResponder(context: Context): IncidentsByResponders;
@@ -113,7 +121,7 @@ export class AnalitycsApi implements Analytics {
     const incidentsBuckets: Record<string, number> = {};
 
     // add empty buckets for hours with no incident
-    for (let h = 0; h < 23; h++) {
+    for (let h = 0; h <= 23; h++) {
       incidentsBuckets[h] = 0;
     }
 
@@ -131,6 +139,34 @@ export class AnalitycsApi implements Analytics {
     ));
 
     data.sort((a, b) => parseInt(a.hour, 10) - parseInt(b.hour, 10));
+
+    return data;
+  }
+
+  incidentsByDay(context: Context): DailyIncidents[] {
+    const incidentsBuckets: Record<string, number> = {};
+
+    // add empty buckets for days with no incident
+    for (let d = 0; d < 7; d++) {
+      incidentsBuckets[d] = 0;
+    }
+
+    context.incidents.forEach(incident => {
+      const incidentDate = moment(incident.impactStartDate);
+
+      incidentsBuckets[incidentDate.day()] += 1;
+    });
+
+    const data = Object.keys(incidentsBuckets).map(day => (
+      {
+        day: moment().day(day).format('dddd'),
+        dayNum: parseInt(day, 10),
+        total: incidentsBuckets[day],
+      }
+    ));
+
+    // Mondays first.
+    data.sort((a, b) => (a.dayNum + 6) % 7 - (b.dayNum + 6) % 7);
 
     return data;
   }

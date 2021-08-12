@@ -83,7 +83,7 @@ export interface WeeklyIncidentsByResponders {
 }
 
 export interface QuarterlyIncidentsByResponders {
-  dataPoints: { quarter: string; date: moment.Moment }[]
+  dataPoints: { quarter: string; total: number, date: moment.Moment }[]
   responders: string[];
 }
 
@@ -331,7 +331,7 @@ export class AnalitycsApi implements Analytics {
     const {incidents, from, to} = await this.incidents();
     const teams = await this.opsgenieApi.getTeams();
 
-    const incidentsBuckets: Record<string, { responders: Record<string, number>, date: moment.Moment }> = {};
+    const incidentsBuckets: Record<string, { responders: Record<string, number>, total: number, date: moment.Moment }> = {};
     const respondersMap: Record<string, boolean> = {};
 
     // add empty buckets for quarters with no incident (let's be hopeful, might happen)
@@ -341,6 +341,7 @@ export class AnalitycsApi implements Analytics {
       if (!incidentsBuckets[quarter]) {
         incidentsBuckets[quarter] = {
           responders: {},
+          total: 0,
           date: from.clone(),
         };
       }
@@ -360,11 +361,13 @@ export class AnalitycsApi implements Analytics {
       }
 
       incidentsBuckets[quarter].responders[responder] += 1;
+      incidentsBuckets[quarter].total += 1;
     });
 
     const data = Object.keys(incidentsBuckets).map(quarter => {
       const dataPoint: any = {
         quarter: quarter,
+        total:incidentsBuckets[quarter].total,
         date: incidentsBuckets[quarter].date,
       };
 

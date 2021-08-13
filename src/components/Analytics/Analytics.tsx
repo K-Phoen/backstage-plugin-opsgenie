@@ -6,6 +6,8 @@ import { WeeklyIncidentsResponders } from './WeeklyIncidentsResponder';
 import { QuarterlyIncidentsResponders } from './QuarterlyIncidentsResponder';
 import { HourlyIncidents } from './HourlyIncidents';
 import { MonthlyIncidentsResponders } from './MonthlyIncidentsResponder';
+import { DailyIncidentsResponders } from './DailyIncidentsResponder';
+import { DailyIncidents } from './DailyIncidents';
 import { configApiRef, useApi } from '@backstage/core-plugin-api';
 import moment from 'moment';
 import { opsgenieApiRef } from '../../api';
@@ -13,7 +15,6 @@ import { useAsync } from 'react-use';
 import { Progress } from '@backstage/core-components';
 import { Alert } from '@material-ui/lab';
 import { Context, DEFAULT_BUSINESS_HOURS_END, DEFAULT_BUSINESS_HOURS_START } from '../../analytics';
-import { DailyIncidents } from './DailyIncidents';
 import { InfoPanel } from '../InfoPanel';
 
 export const Analytics = () => {
@@ -88,6 +89,10 @@ export const Analytics = () => {
 
             <Grid item md={6} xs={12}>
                 <HourlyIncidents context={context} />
+            </Grid>
+
+            <Grid item md={6} xs={12}>
+                <DailyIncidentsResponders context={context} />
             </Grid>
 
             <Grid item md={6} xs={12}>

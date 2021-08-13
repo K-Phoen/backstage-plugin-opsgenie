@@ -100,6 +100,7 @@ export interface Analytics {
   incidentsByWeekAndHours(context: Context): WeeklyIncidentsByHour[];
   incidentsByWeekAndSeverity(context: Context): WeeklyIncidentsBySeverity[];
 
+  incidentsByDayAndResponder(context: Context): IncidentsByResponders;
   incidentsByWeekAndResponder(context: Context): IncidentsByResponders;
   incidentsByMonthAndResponder(context: Context): IncidentsByResponders;
   incidentsByQuarterAndResponder(context: Context): IncidentsByResponders;
@@ -277,6 +278,56 @@ export class AnalitycsApi implements Analytics {
     sortByDate(data);
 
     return data;
+  }
+
+  incidentsByDayAndResponder(context: Context): IncidentsByResponders {
+    const incidentsBuckets: Record<string, { responders: Record<string, number>, total: number }> = {};
+    const respondersMap: Record<string, boolean> = {};
+
+    // add empty buckets for days with no incident
+    for (let d = 0; d < 7; d++) {
+      incidentsBuckets[d] = {
+        total: 0,
+        responders: {},
+      };
+    }
+
+    context.incidents.forEach(incident => {
+      const incidentDate = moment(incident.impactStartDate);
+      const day = incidentDate.day();
+      const responder = respondingTeam(context.teams, incident);
+
+      respondersMap[responder] = true;
+
+      if (!incidentsBuckets[day].responders[responder]) {
+        incidentsBuckets[day].responders[responder] = 0;
+      }
+
+      incidentsBuckets[day].responders[responder] += 1;
+      incidentsBuckets[day].total += 1;
+    });
+
+    const data = Object.keys(incidentsBuckets).map(day => {
+      const dataPoint: any = {
+        period: moment().day(day).format('dddd'),
+        dayNum: parseInt(day, 10),
+        total: incidentsBuckets[day].total,
+      };
+
+      Object.keys(respondersMap).forEach(responder => {
+        dataPoint[responder] = incidentsBuckets[day].responders[responder] || 0;
+      });
+
+      return dataPoint;
+    });
+
+    // Mondays first.
+    data.sort((a, b) => (a.dayNum + 6) % 7 - (b.dayNum + 6) % 7);
+
+    return {
+      dataPoints: data,
+      responders: Object.keys(respondersMap),
+    };
   }
 
   incidentsByMonthAndResponder(context: Context): IncidentsByResponders {

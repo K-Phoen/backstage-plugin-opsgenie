@@ -174,5 +174,5 @@ export const OnCallList = () => {
         );
     }
 
-    return <SchedulesGrid schedules={value!} />;
+    return <SchedulesGrid schedules={value!.filter(schedule => schedule.enabled)} />;
 };

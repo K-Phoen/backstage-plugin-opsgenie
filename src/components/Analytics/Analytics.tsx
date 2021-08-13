@@ -6,16 +6,18 @@ import { WeeklyIncidentsResponders } from './WeeklyIncidentsResponder';
 import { QuarterlyIncidentsResponders } from './QuarterlyIncidentsResponder';
 import { HourlyIncidents } from './HourlyIncidents';
 import { MonthlyIncidentsResponders } from './MonthlyIncidentsResponder';
-import { useApi } from '@backstage/core-plugin-api';
+import { configApiRef, useApi } from '@backstage/core-plugin-api';
 import moment from 'moment';
 import { opsgenieApiRef } from '../../api';
 import { useAsync } from 'react-use';
 import { Progress } from '@backstage/core-components';
 import { Alert } from '@material-ui/lab';
-import { Context } from '../../analytics';
+import { Context, DEFAULT_BUSINESS_HOURS_END, DEFAULT_BUSINESS_HOURS_START } from '../../analytics';
 import { DailyIncidents } from './DailyIncidents';
+import { InfoPanel } from '../InfoPanel';
 
 export const Analytics = () => {
+    const configApi = useApi(configApiRef);
     const opsgenieApi = useApi(opsgenieApiRef);
 
     const from = moment().subtract(1, 'year').startOf('quarter');
@@ -44,8 +46,26 @@ export const Analytics = () => {
         teams: data![1],
     };
 
+    const businessHours = {
+        start: configApi.getOptionalNumber('opsgenie.analytics.businessHours.start') || DEFAULT_BUSINESS_HOURS_START,
+        end: configApi.getOptionalNumber('opsgenie.analytics.businessHours.end') || DEFAULT_BUSINESS_HOURS_END,
+    };
+
     return (
         <Grid container spacing={3}>
+            <Grid item xs={12}>
+                <InfoPanel
+                    title="This graphs cover one year worth of incidents, from the current quarter to the same quarter last year."
+                    message={
+                        <ul>
+                            <li>Incidents from {from.format('LL')} to now are used</li>
+                            <li>Business hours are {businessHours.start} to {businessHours.end}</li>
+                            <li>Responders are read from the <code>responders</code> incident extra property if defined, or from the "responders" section of an incident.</li>
+                        </ul>
+                    }
+                />
+            </Grid>
+
             <Grid item md={6} xs={12}>
                 <WeeklyIncidents context={context} />
             </Grid>

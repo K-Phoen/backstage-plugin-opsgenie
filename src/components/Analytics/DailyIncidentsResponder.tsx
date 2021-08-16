@@ -12,7 +12,7 @@ export const DailyIncidentsResponders = ({context}: {context: Context}) => {
 
     return (
         <InfoCard title="Incidents by day and responder" action={<SaveAction targetRef={graphId} />}>
-        <div id={graphId} style={{ width: '100%', height: 300, paddingTop: '1.2rem', paddingRight: '1.2rem' }}>
+        <div id={graphId} style={{ width: '100%', height: 450, paddingTop: '1.2rem', paddingRight: '1.2rem' }}>
             <PeriodByResponderGraph data={data!} />
         </div>
     </InfoCard>

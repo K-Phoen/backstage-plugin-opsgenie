@@ -16,6 +16,7 @@ import { Progress } from '@backstage/core-components';
 import { Alert } from '@material-ui/lab';
 import { Context, DEFAULT_BUSINESS_HOURS_END, DEFAULT_BUSINESS_HOURS_START } from '../../analytics';
 import { InfoPanel } from '../InfoPanel';
+import { WeeklyImpactResponders } from './WeeklyImpactResponder';
 
 export const Analytics = () => {
     const configApi = useApi(configApiRef);
@@ -88,15 +89,19 @@ export const Analytics = () => {
             </Grid>
 
             <Grid item md={6} xs={12}>
-                <HourlyIncidents context={context} />
-            </Grid>
-
-            <Grid item md={6} xs={12}>
                 <DailyIncidentsResponders context={context} />
             </Grid>
 
             <Grid item md={6} xs={12}>
+                <HourlyIncidents context={context} />
+            </Grid>
+
+            <Grid item md={6} xs={12}>
                 <DailyIncidents context={context} />
+            </Grid>
+
+            <Grid item md={6} xs={12}>
+                <WeeklyImpactResponders context={context} />
             </Grid>
         </Grid>
     );

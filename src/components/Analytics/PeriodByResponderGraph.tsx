@@ -2,8 +2,8 @@ import React from 'react';
 import {
     ComposedChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Legend, Line
 } from 'recharts';
-import stc from 'string-to-color';
 import { IncidentsByResponders } from '../../analytics';
+import { colorForString } from './utils';
 
 export const PeriodByResponderGraph = ({data}: {data: IncidentsByResponders}) => {
     return (
@@ -13,7 +13,7 @@ export const PeriodByResponderGraph = ({data}: {data: IncidentsByResponders}) =>
                 <XAxis dataKey="period" />
                 <YAxis />
                 {data.responders.map(responder => (
-                    <Bar dataKey={responder} fill={stc(responder)} stackId="a" barSize={30}  key={responder} />
+                    <Bar dataKey={responder} fill={colorForString(responder)} stackId="a" barSize={30}  key={responder} />
                 ))}
                 <Line type="monotone" dataKey="total" name="Total" stroke="#ff7300" />
                 <Tooltip />

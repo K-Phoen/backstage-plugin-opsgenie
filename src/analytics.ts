@@ -104,6 +104,8 @@ export interface Analytics {
   incidentsByWeekAndResponder(context: Context): IncidentsByResponders;
   incidentsByMonthAndResponder(context: Context): IncidentsByResponders;
   incidentsByQuarterAndResponder(context: Context): IncidentsByResponders;
+
+  impactByWeekAndResponder(context: Context): IncidentsByResponders;
 }
 
 interface BusinessHours {
@@ -494,6 +496,69 @@ export class AnalitycsApi implements Analytics {
 
       Object.keys(respondersMap).forEach(responder => {
         dataPoint[responder] = incidentsBuckets[quarter].responders[responder] || 0;
+      });
+
+      return dataPoint;
+    });
+
+    sortByDate(data);
+
+    return {
+      dataPoints: data,
+      responders: Object.keys(respondersMap),
+    };
+  }
+
+  impactByWeekAndResponder(context: Context): IncidentsByResponders {
+    const incidentsBuckets: Record<string, { responders: Record<string, number[]>, durations: number[], date: moment.Moment }> = {};
+    const respondersMap: Record<string, boolean> = {};
+
+    const minDate = context.from.clone().startOf('isoWeek');
+    const maxDate = context.to.clone().startOf('isoWeek');
+
+    const average = (durations: number[]) => durations.length === 0 ? 0 : durations.reduce((a, b) => a + b, 0) / durations.length;
+
+    // add empty buckets for weeks with no incident
+    while (minDate <= maxDate) {
+      const week = `w${minDate.isoWeek()} - ${minDate.year()}`;
+
+      if (!incidentsBuckets[week]) {
+        incidentsBuckets[week] = {
+          responders: {},
+          durations: [],
+          date: minDate.clone(),
+        };
+      }
+
+      minDate.add(1, 'weeks');
+    }
+
+    context.incidents.forEach(incident => {
+      const incidentDate = moment(incident.impactStartDate);
+      const incidentEnd = moment(incident.impactEndDate);
+      const week = `w${incidentDate.isoWeek()} - ${incidentDate.year()}`;
+      const responder = respondingTeam(context.teams, incident);
+      const impactDuration = incidentEnd.diff(incidentDate, 'minutes');
+
+      respondersMap[responder] = true;
+
+      if (!incidentsBuckets[week].responders[responder]) {
+        incidentsBuckets[week].responders[responder] = [];
+      }
+
+      incidentsBuckets[week].responders[responder].push(impactDuration);
+      incidentsBuckets[week].durations.push(impactDuration);
+    });
+
+    const data = Object.keys(incidentsBuckets).map(week => {
+      const dataPoint: any = {
+        period: week,
+        total: average(incidentsBuckets[week].durations),
+        date: incidentsBuckets[week].date,
+      };
+
+      Object.keys(respondersMap).forEach(responder => {
+        dataPoint[responder] = incidentsBuckets[week].responders[responder] ? average(incidentsBuckets[week].responders[responder]) : 0;
       });
 
       return dataPoint;

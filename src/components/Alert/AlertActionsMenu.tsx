@@ -34,7 +34,7 @@ export const AlertActionsMenu = ({ alert, onAlertChanged }: { alert: Alert, onAl
             alert.acknowledged = true;
             callback(alert);
         } catch (err) {
-            alertApi.post({message: err, severity: 'error'});
+            alertApi.post({message: `Could not acknowledge alert: ${err}`, severity: 'error'});
         }
     };
 
@@ -47,7 +47,7 @@ export const AlertActionsMenu = ({ alert, onAlertChanged }: { alert: Alert, onAl
             alert.status = 'closed';
             callback(alert);
         } catch (err) {
-            alertApi.post({message: err, severity: 'error'});
+            alertApi.post({message: `Could not close alert: ${err}`, severity: 'error'});
         }
     };
 

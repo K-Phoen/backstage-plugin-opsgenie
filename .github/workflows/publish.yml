@@ -23,7 +23,7 @@ jobs:
         run: yarn tsc
 
       - name: Build
-        run: yarn build-rollup
+        run: yarn build
 
       - name: Publish if version has been updated
         uses: pascalgn/npm-publish-action@1.3.5

@@ -82,3 +82,30 @@ annotations:
 ```
 
 This annotation accepts any valid [Opsgenie search query](https://support.atlassian.com/opsgenie/docs/search-queries-for-alerts/) for alerts.
+
+## Customizations
+
+The Opsgenie page can be customized.
+
+```tsx
+// CustomOpsGeniePage.tsx
+export const CustomOpsgeniePage = () => {
+  return (
+    <Layout>
+      <Layout.Route path="who-is-on-call" title="Who is on-call">
+        <OnCallList />
+      </Layout.Route>
+    </Layout>
+  );
+};
+```
+
+```tsx
+// App.tsx
+import { CustomOpsgeniePage } from './CustomOpsgeniePage';
+
+// ...
+<Route path="/opsgenie" element={<OpsgeniePage />} >
+  <CustomOpsgeniePage />
+</Route>
+```

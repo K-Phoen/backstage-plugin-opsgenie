@@ -6,6 +6,7 @@ import { InfoCard } from '@backstage/core-components';
 import { useApi } from '@backstage/core-plugin-api';
 import { analyticsApiRef, Context } from '../../analytics';
 import { SaveAction } from './SaveAction';
+import { FilterZeroTooltip } from './FilterZeroTooltip';
 
 const Graph = ({context}: {context: Context}) => {
     const analyticsApi = useApi(analyticsApiRef);
@@ -18,7 +19,7 @@ const Graph = ({context}: {context: Context}) => {
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="day" name="Day" />
                     <YAxis dataKey="total" name="Total" />
-                    <Tooltip />
+                    <Tooltip content={<FilterZeroTooltip />} />
                     <Scatter name="day" data={dataPoints} fill="#8884d8" />
                 </ScatterChart>
             </ResponsiveContainer>

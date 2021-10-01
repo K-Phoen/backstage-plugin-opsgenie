@@ -469,7 +469,7 @@ export class AnalitycsApi implements Analytics {
         };
       }
 
-      from.add(1, 'weeks');
+      from.add(1, 'quarter');
     }
 
     context.incidents.forEach(incident => {
@@ -486,6 +486,7 @@ export class AnalitycsApi implements Analytics {
       incidentsBuckets[quarter].responders[responder] += 1;
       incidentsBuckets[quarter].total += 1;
     });
+
 
     const data = Object.keys(incidentsBuckets).map(quarter => {
       const dataPoint: any = {

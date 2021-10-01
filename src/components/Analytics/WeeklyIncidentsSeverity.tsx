@@ -1,11 +1,12 @@
 import React from 'react';
 import {
-    ComposedChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Legend
+    ComposedChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Legend,
 } from 'recharts';
 import { InfoCard } from '@backstage/core-components';
 import { useApi } from '@backstage/core-plugin-api';
 import { analyticsApiRef, Context } from '../../analytics';
 import { SaveAction } from './SaveAction';
+import { FilterZeroTooltip } from './FilterZeroTooltip';
 
 const Graph = ({context}: {context: Context}) => {
     const analyticsApi = useApi(analyticsApiRef);
@@ -23,7 +24,7 @@ const Graph = ({context}: {context: Context}) => {
                     <Bar dataKey="p3" fill="#ffab00" name="P3 - Moderate" stackId="a" barSize={30} />
                     <Bar dataKey="p4" fill="#36b37e" name="P4 - Low" stackId="a" barSize={30} />
                     <Bar dataKey="p5" fill="#00857A" name="P5 - Informational" stackId="a" barSize={30} />
-                    <Tooltip />
+                    <Tooltip content={<FilterZeroTooltip />} />
                     <Legend />
                 </ComposedChart>
             </ResponsiveContainer>

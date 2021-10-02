@@ -26,7 +26,25 @@ export const FilterZeroTooltip = (props: any) => {
     return null;
   }
 
-  const items = filteredPayload.map((row: any) => <p key={row.dataKey} style={{color: row.fill}}>{`${row.name}: ${row.payload[row.dataKey]}`}</p>)
+  const items = filteredPayload.map((row: any) => {
+    let value = row.payload[row.dataKey];
+    let name = row.name;
+
+    if (props.formatter) {
+      const formatted = props.formatter(value, name);
+      if (Array.isArray(formatted)) {
+        name = formatted[1];
+        value = formatted[0];
+      } else {
+        value = formatted;
+      }
+    }
+
+    return (
+      <p key={row.dataKey} style={{color: row.fill}}>
+        {`${name}: ${value}`}
+      </p>);
+  });
 
   return (
     <div className={classes.tooltip}>

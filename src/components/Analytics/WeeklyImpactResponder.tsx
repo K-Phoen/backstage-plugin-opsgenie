@@ -6,6 +6,7 @@ import { SaveAction } from './SaveAction';
 import { colorForString } from './utils';
 import { Bar, CartesianGrid, ComposedChart, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import moment from 'moment';
+import { FilterZeroTooltip } from './FilterZeroTooltip';
 
 export const WeeklyImpactResponders = ({ context }: { context: Context }) => {
     const graphId = "weekly-impact-responders";
@@ -28,6 +29,7 @@ export const WeeklyImpactResponders = ({ context }: { context: Context }) => {
 
                         <Tooltip
                             formatter={(value: number, name: string) => [value === 0 ? '0 min' : moment.duration(value, 'minutes').humanize(), name]}
+                            content={<FilterZeroTooltip />}
                         />
                         <Legend />
                     </ComposedChart>

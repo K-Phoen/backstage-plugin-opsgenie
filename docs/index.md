@@ -7,5 +7,5 @@
 
 ## Usage
 
-* Annotating entities
+* [Display alerts on a component page](alerts-on-component-page.md)
 * Incident analytics

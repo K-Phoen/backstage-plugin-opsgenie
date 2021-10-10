@@ -5,6 +5,7 @@ nav:
   - Home: index.md
   - Setup: setup.md
   - 'Creating an Opsgenie API key': creating-api-key.md
+  - 'Display alerts on a component page': alerts-on-component-page.md
 
 plugins:
   - techdocs-core

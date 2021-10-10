@@ -1,111 +1,32 @@
 # Opsgenie plugin for Backstage
 
-Welcome to the Opsgenie plugin!
+The Opsgenie plugin is a frontend plugin that displays Opsgenie alerts, incidents and on-call information in Backstage. The plugin includes two components that can be integrated into Backstage:
+
+*  The `OpsGeniePage` routable extension component which produces a standalone page with the following capabilities:
+    * view a summary of who is currently on call
+    * view and search a list of active alerts with the option of acknowledging or closing alerts directly from Backstage
+    * view and search a list of incidents
+    * view incident-related analytics
+* The `EntityOpsgenieAlertsCard` component which can display recent alerts for a specific component.
+
+## Setup
+
+Find [installation instructions](./docs/index.md#installation) in our documentation.
+
+## How does it look?
 
 Alerts page:
+
 ![Opsgenie alerts page](./docs/opsgenie-alerts-page.png)
 
 Incidents page:
+
 ![Opsgenie incidents page](./docs/opsgenie-incidents-page.png)
 
 Alerts card:
+
 ![Opsgenie alerts card](./docs/opsgenie-alerts-card.png)
 
-## Plugin Setup
+## License
 
-1. If you have standalone app (you didn't clone this repository), then do:
-
-```bash
-yarn add @k-phoen/backstage-plugin-opsgenie
-```
-
-2. Configure the plugin:
-
-```yaml
-
-proxy:
-  '/opsgenie/api':
-    target: https://api.eu.opsgenie.com
-    headers:
-      Authorization: GenieKey [[ API KEY here ]]
-
-opsgenie:
-  domain: https://my-app.app.eu.opsgenie.com/
-```
-
-**Note:** this plugin requires an API key issued from an integration. They can be retrieved from the "Settings" tab and then "Integrations" tab.
-
-3. Expose the plugin to your Backstage instance:
-
-```ts
-// packages/app/src/App.tsx
-import { OpsgeniePage } from '@k-phoen/backstage-plugin-opsgenie';
-
-// ...
-
-const AppRoutes = () => (
-  <FlatRoutes>
-    /// ...
-    <Route path="/opsgenie" element={<OpsgeniePage />} />
-    // ...
-  </FlatRoutes>
-);
-```
-
-4. Add it to the `EntityPage.ts`:
-
-```ts
-import {
-  EntityOpsgenieAlertsCard,
-  isOpsgenieAvailable
-} from '@k-phoen/backstage-plugin-opsgenie';
-
-// add wherever you want to display the alerts card:
-<EntitySwitch>
-  <EntitySwitch.Case if={isOpsgenieAvailable}>
-    <EntityOpsgenieAlertsCard />
-  </EntitySwitch.Case>
-</EntitySwitch>
-```
-
-5. Run backstage app with `yarn start` and navigate to services tabs.
-
-
-## Components annotations
-
-In order for this plugin to know what alerts belong to which component, a selector must
-be defined:
-
-```yml
-annotations:
-  opsgenie.com/component-selector: 'tag:"service:my-awesome-service"'
-```
-
-This annotation accepts any valid [Opsgenie search query](https://support.atlassian.com/opsgenie/docs/search-queries-for-alerts/) for alerts.
-
-## Customizations
-
-The Opsgenie page can be customized.
-
-```tsx
-// CustomOpsGeniePage.tsx
-export const CustomOpsgeniePage = () => {
-  return (
-    <Layout>
-      <Layout.Route path="who-is-on-call" title="Who is on-call">
-        <OnCallList />
-      </Layout.Route>
-    </Layout>
-  );
-};
-```
-
-```tsx
-// App.tsx
-import { CustomOpsgeniePage } from './CustomOpsgeniePage';
-
-// ...
-<Route path="/opsgenie" element={<OpsgeniePage />} >
-  <CustomOpsgeniePage />
-</Route>
-```
+This library is under the [MIT](LICENSE) license.

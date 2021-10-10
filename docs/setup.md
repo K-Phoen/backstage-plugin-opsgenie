@@ -6,7 +6,7 @@ Add the plugin to your frontend app:
 cd packages/app && yarn add @k-phoen/backstage-plugin-opsgenie
 ```
 
-Configure the plugin in `app-config.yaml`. The proxy endpoint describe below will allow the frontend
+Configure the plugin in `app-config.yaml`. The proxy endpoint described below will allow the frontend
 to authenticate with Opsgenie without exposing your API key to users.
 [Create an API key](creating-api-key.md) if you don't already have one.
 

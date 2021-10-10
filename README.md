@@ -15,6 +15,10 @@ Find [installation instructions](./docs/index.md#installation) in our documentat
 
 ## How does it look?
 
+"Who is on call?" page:
+
+![Opsgenie on-call page](./docs/opsgenie-on-call-page.png)
+
 Alerts page:
 
 ![Opsgenie alerts page](./docs/opsgenie-alerts-page.png)
@@ -23,9 +27,13 @@ Incidents page:
 
 ![Opsgenie incidents page](./docs/opsgenie-incidents-page.png)
 
+Incidents analytics page:
+
+![Opsgenie incidents analytics page](./docs/opsgenie-analytics-page.png)
+
 Alerts card:
 
-![Opsgenie alerts card](./docs/opsgenie-alerts-card.png)
+![Opsgenie alerts card](./docs/entity-overview.png)
 
 ## License
 

@@ -8,4 +8,4 @@
 ## Usage
 
 * [Display alerts on a component page](alerts-on-component-page.md)
-* Incident analytics
+* [Incidents analytics page](incidents-analytics.md)

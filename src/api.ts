@@ -10,6 +10,7 @@ export const opsgenieApiRef = createApiRef<Opsgenie>({
 
 type AlertsFetchOpts = {
   limit?: number
+  query?: string
 }
 
 type IncidentsFetchOpts = {
@@ -20,7 +21,7 @@ type IncidentsFetchOpts = {
 }
 
 export interface Opsgenie {
-  getAlerts(opts?: AlertsFetchOpts): Promise<Alert[]>;
+  getAlerts(opts?: AlertsFetchOpts, query?: string): Promise<Alert[]>;
   getIncidents(opts?: IncidentsFetchOpts): Promise<Incident[]>;
 
   getAlertsForEntity(entity: Entity, opts?: AlertsFetchOpts): Promise<Alert[]>;
@@ -122,7 +123,8 @@ export class OpsgenieApi implements Opsgenie {
 
   async getAlerts(opts?: AlertsFetchOpts): Promise<Alert[]> {
     const limit = opts?.limit || 50;
-    const response = await this.fetch<AlertsResponse>(`/v2/alerts?limit=${limit}`);
+    const query = opts?.query ? `&query=${opts?.query}` : '';
+    const response = await this.fetch<AlertsResponse>(`/v2/alerts?limit=${limit}${query}`);
 
     return response.data;
   }

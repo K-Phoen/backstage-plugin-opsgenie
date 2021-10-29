@@ -36,6 +36,3 @@ dist-workspace
 
 # Local configuration files
 *.local.yaml
-
-# Yarn
-yarn.lock

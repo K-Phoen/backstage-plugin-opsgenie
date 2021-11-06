@@ -7,3 +7,4 @@ export { AlertsList } from './components/AlertsTable';
 export { IncidentsList } from './components/IncidentsTable';
 export { OnCallList } from './components/OnCallList';
 export { Analytics } from './components/Analytics';
+export { AlertsSummary } from './components/AlertsSummary';

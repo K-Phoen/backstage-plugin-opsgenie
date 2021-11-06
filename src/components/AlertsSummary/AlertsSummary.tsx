@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, makeStyles, Typography } from '@material-ui/core';
 import { useAsync } from 'react-use';
 import { Alert as AlertUI } from '@material-ui/lab';
-import { Entity } from '@backstage/catalog-model';
 import moment from "moment";
 
 import { opsgenieApiRef } from '../../api';
@@ -65,10 +64,9 @@ const AlertsSummaryTable = ({ alerts }: { alerts: Alert[] }) => {
     );
 };
 
-export const AlertsSummary = ({ entity }: { entity: Entity }) => {
+export const AlertsSummary = ({ query }: { query: string }) => {
     const opsgenieApi = useApi(opsgenieApiRef);
-
-    const { value, loading, error } = useAsync(async () => await opsgenieApi.getAlertsForEntity(entity, {limit: 3}));
+    const { value, loading, error } = useAsync(async () => await opsgenieApi.getAlerts({limit: 3, query: query}));
 
     if (loading) {
         return <Progress />;

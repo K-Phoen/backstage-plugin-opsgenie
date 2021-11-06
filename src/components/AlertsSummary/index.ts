@@ -1,0 +1,1 @@
+export { AlertsSummary } from './AlertsSummary';

@@ -1,5 +1,3 @@
-import { Entity } from '@backstage/catalog-model';
-import { OPSGENIE_ANNOTATION } from './integration';
 import { Alert, Incident, OnCallParticipantRef, Schedule, Team } from './types';
 import { createApiRef, DiscoveryApi, IdentityApi } from '@backstage/core-plugin-api';
 
@@ -21,10 +19,9 @@ type IncidentsFetchOpts = {
 }
 
 export interface Opsgenie {
-  getAlerts(opts?: AlertsFetchOpts, query?: string): Promise<Alert[]>;
+  getAlerts(opts?: AlertsFetchOpts): Promise<Alert[]>;
   getIncidents(opts?: IncidentsFetchOpts): Promise<Incident[]>;
 
-  getAlertsForEntity(entity: Entity, opts?: AlertsFetchOpts): Promise<Alert[]>;
   getAlertDetailsURL(alert: Alert): string;
 
   acknowledgeAlert(alert: Alert): Promise<void>;
@@ -148,20 +145,11 @@ export class OpsgenieApi implements Opsgenie {
     return incidents;
   }
 
-  async getAlertsForEntity(entity: Entity, opts?: AlertsFetchOpts): Promise<Alert[]> {
-    const limit = opts?.limit || 5;
-    const query = entity.metadata.annotations?.[OPSGENIE_ANNOTATION];
-
-    const response = await this.fetch<AlertsResponse>(`/v2/alerts?limit=${limit}&query=${query}`);
-
-    return response.data;
-  }
-
   async acknowledgeAlert(alert: Alert): Promise<void> {
     const init = {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({source: 'Backstage — Opsgenie plugin'}),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ source: 'Backstage — Opsgenie plugin' }),
     };
 
     await this.call(`/v2/alerts/${alert.id}/acknowledge`, init);
@@ -170,8 +158,8 @@ export class OpsgenieApi implements Opsgenie {
   async closeAlert(alert: Alert): Promise<void> {
     const init = {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({source: 'Backstage — Opsgenie plugin'}),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ source: 'Backstage — Opsgenie plugin' }),
     };
 
     await this.call(`/v2/alerts/${alert.id}/close`, init);

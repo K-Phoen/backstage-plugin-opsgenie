@@ -1,7 +1,8 @@
 import React from 'react';
 import { useEntity } from '@backstage/plugin-catalog-react';
-import { AlertsSummary } from './AlertsSummary';
-import { InfoCard, InfoCardVariants } from '@backstage/core-components';
+import { InfoCard, InfoCardVariants, MissingAnnotationEmptyState } from '@backstage/core-components';
+import { OPSGENIE_ANNOTATION } from '../../integration';
+import { AlertsSummary } from '../AlertsSummary';
 
 type AlertsCardProps = {
     title?: string;
@@ -10,10 +11,17 @@ type AlertsCardProps = {
 
 export const AlertsCard = ({ title, variant }: AlertsCardProps) => {
     const { entity } = useEntity();
+    const query = entity.metadata.annotations?.[OPSGENIE_ANNOTATION];
+
+    if (!query) {
+        return (
+            <MissingAnnotationEmptyState annotation={OPSGENIE_ANNOTATION} />
+        );
+    }
 
     return (
         <InfoCard title={title || "Opsgenie — Alerts"} variant={variant || "gridItem"}>
-            <AlertsSummary entity={entity} />
+            <AlertsSummary query={query} />
         </InfoCard>
     );
 };

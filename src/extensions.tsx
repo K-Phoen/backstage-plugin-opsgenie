@@ -3,6 +3,7 @@ import { createComponentExtension, createRoutableExtension } from '@backstage/co
 
 export const OpsgeniePage = opsGeniePlugin.provide(
   createRoutableExtension({
+    name: 'OpsgeniePage',
     component: () => import('./components/OpsgeniePage').then(m => m.OpsgeniePage),
     mountPoint: opsgenieRouteRef,
   }),
@@ -10,6 +11,7 @@ export const OpsgeniePage = opsGeniePlugin.provide(
 
 export const EntityOpsgenieAlertsCard = opsGeniePlugin.provide(
   createComponentExtension({
+    name: 'EntityOpsgenieAlertsCard',
     component: {
       lazy: () => import('./components/Entity').then(m => m.AlertsCard),
     },

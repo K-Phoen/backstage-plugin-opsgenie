@@ -1303,6 +1303,24 @@
     react-use "^17.2.4"
     zen-observable "^0.8.15"
 
+"@backstage/core-plugin-api@^0.2.0":
+  version "0.2.0"
+  resolved "https://artifactory.klarna.net/artifactory/api/npm/v-npm-production/@backstage/core-plugin-api/-/core-plugin-api-0.2.0.tgz#b004fde338cc92ca1f7c251f71fbab1a2c373259"
+  integrity sha1-sAT94zjMksoffCUfcfurGiw3Mlk=
+  dependencies:
+    "@backstage/config" "^0.1.11"
+    "@backstage/theme" "^0.2.13"
+    "@backstage/types" "^0.1.1"
+    "@backstage/version-bridge" "^0.1.0"
+    "@material-ui/core" "^4.12.2"
+    "@types/react" "*"
+    history "^5.0.0"
+    prop-types "^15.7.2"
+    react "^16.12.0"
+    react-router-dom "6.0.0-beta.0"
+    react-use "^17.2.4"
+    zen-observable "^0.8.15"
+
 "@backstage/dev-utils@^0.2.12":
   version "0.2.12"
   resolved "https://registry.yarnpkg.com/@backstage/dev-utils/-/dev-utils-0.2.12.tgz#e443f3b59804efa9f199651c9b7510b7e6578ce2"
@@ -1502,6 +1520,13 @@
   version "0.2.12"
   resolved "https://registry.yarnpkg.com/@backstage/theme/-/theme-0.2.12.tgz#a11c07dac1ffb1bbdd7758752d3e996120cc19e9"
   integrity sha512-1S81lNzNC+30qogWSMEasR6cYzozwW4U6Zi02nWfS8KcMT+o8kqY7MNlCibo+lLsKXs7gZwTNYUxq7lAkkNSAA==
+  dependencies:
+    "@material-ui/core" "^4.12.2"
+
+"@backstage/theme@^0.2.13":
+  version "0.2.13"
+  resolved "https://artifactory.klarna.net/artifactory/api/npm/v-npm-production/@backstage/theme/-/theme-0.2.13.tgz#3412d5f149c8c9bfc80b58e3832c5e06021063a2"
+  integrity sha1-NBLV8UnIyb/IC1jjgyxeBgIQY6I=
   dependencies:
     "@material-ui/core" "^4.12.2"
 

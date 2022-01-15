@@ -3,7 +3,6 @@ import { createApiRef, DiscoveryApi, IdentityApi } from '@backstage/core-plugin-
 
 export const opsgenieApiRef = createApiRef<Opsgenie>({
   id: 'plugin.opsgenie.service',
-  description: 'Used to make requests towards Opsgenie API',
 });
 
 type AlertsFetchOpts = {

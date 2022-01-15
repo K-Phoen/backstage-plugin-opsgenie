@@ -10,7 +10,7 @@ import {
 import { AnalitycsApi, analyticsApiRef, DEFAULT_BUSINESS_HOURS_END, DEFAULT_BUSINESS_HOURS_START } from './analytics';
 
 export const opsgenieRouteRef = createRouteRef({
-  title: 'opsgenie',
+  id: 'opsgenie',
 });
 
 export const opsGeniePlugin = createPlugin({

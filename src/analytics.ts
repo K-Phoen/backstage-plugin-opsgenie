@@ -9,7 +9,6 @@ export const DEFAULT_BUSINESS_HOURS_END = 18;
 
 export const analyticsApiRef = createApiRef<Analytics>({
   id: 'plugin.opsgenie.analytics',
-  description: 'Used to generate analytics',
 });
 
 const teamName = (teams: Team[], teamId: string): string => {

@@ -3,12 +3,14 @@
 Because of the features provided by the plugin, an API key with full access to your Opsgenie domain is required.
 Read access is needed to list alerts, write access to acknowledge them directly from Backstage, …
 
-Such API key can be created from the "Settings" panel, under the "API key management" section:
+## How to create an integration for backstage-opsgenie-plugin
 
-![](./api-keys-management-page.png)
+1. Go to `Settings` -> `Integrations` -> `Add Integration`
 
-Make sure you choose a descriptive name for your API key and configure the access rights as follow:
+1. Select "API" integration type
 
-![](./new-api-key-form.png)
+1. Copy Generated API Key and click `Save Integration`
 
-Once the API key is added, use it as value for the `OPSGENIE_API_KEY` environment available to make it available to the plugin.
+    ![New API Integration Form](./new-integration-form.png)
+
+1. Once the API key is added, use it as value for the `OPSGENIE_API_KEY` environment variable to make it available to the plugin.

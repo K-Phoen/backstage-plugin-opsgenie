@@ -12,75 +12,78 @@ import { useApi } from '@backstage/core-plugin-api';
 import { Progress, ItemCardGrid, StatusOK, StatusAborted } from '@backstage/core-components';
 
 const useStyles = makeStyles((theme) =>
-  createStyles({
-    pagination: {
-      marginTop: theme.spacing(2),
-    },
-    search: {
-      marginBottom: theme.spacing(2),
-    },
-    onCallItemGrid: {
-        gridTemplateColumns: 'repeat(auto-fill, minmax(32em, 1fr))',
-    }
-  }),
+    createStyles({
+        pagination: {
+            marginTop: theme.spacing(2),
+        },
+        search: {
+            marginBottom: theme.spacing(2),
+        },
+        onCallItemGrid: {
+            gridTemplateColumns: 'repeat(auto-fill, minmax(32em, 1fr))',
+        }
+    }),
 );
 
 const useDebounce = (value: string, delay: number) => {
     const [debouncedValue, setDebouncedValue] = React.useState(value);
 
     useEffect(
-      () => {
-        // Update debounced value after delay
-        const handler = setTimeout(() => {
-          setDebouncedValue(value);
-        }, delay);
+        () => {
+            // Update debounced value after delay
+            const handler = setTimeout(() => {
+                setDebouncedValue(value);
+            }, delay);
 
-        // Cancel the timeout if value changes (also on delay change or unmount)
-        // This is how we prevent debounced value from updating if value is changed ...
-        // .. within the delay period. Timeout gets cleared and restarted.
-        return () => {
-          clearTimeout(handler);
-        };
-      },
-      [value, delay] // Only re-call effect if value or delay changes
+            // Cancel the timeout if value changes (also on delay change or unmount)
+            // This is how we prevent debounced value from updating if value is changed ...
+            // .. within the delay period. Timeout gets cleared and restarted.
+            return () => {
+                clearTimeout(handler);
+            };
+        },
+        [value, delay] // Only re-call effect if value or delay changes
     );
 
     return debouncedValue;
-  }
+}
 
-const OnCallForScheduleCard = ({ schedule }: { schedule: Schedule }) => {
+export const OnCallForScheduleList = ({ schedule }: { schedule: Schedule }) => {
     const opsgenieApi = useApi(opsgenieApiRef);
     const { value, loading, error } = useAsync(async () => await opsgenieApi.getOnCall(schedule.id));
 
-    let content: ReactNode;
     if (loading) {
-        content = <Progress />
+        return <Progress />
     } else if (error) {
-        content = (
+        return (
             <Alert data-testid="error-message" severity="error">
                 {error.message}
             </Alert>
         );
-    } else {
-        content = (
-            <List>
-                {value!.map((responder, i) => (
-                    <ListItem key={i} button component="a" href={opsgenieApi.getUserDetailsURL(responder.id)}>
-                        <ListItemIcon>
-                            <PersonIcon />
-                        </ListItemIcon>
-
-                        <ListItemText primary={responder.name} />
-                    </ListItem>
-                ))}
-
-                {value!.length === 0 && <ListItem><ListItemText primary="⚠️ No one on-call." /></ListItem>}
-            </List>
-        );
     }
 
+    return (
+        <List>
+            {value!.map((responder, i) => (
+                <ListItem key={i} button component="a" href={opsgenieApi.getUserDetailsURL(responder.id)}>
+                    <ListItemIcon>
+                        <PersonIcon />
+                    </ListItemIcon>
+
+                    <ListItemText primary={responder.name} />
+                </ListItem>
+            ))}
+
+            {value!.length === 0 && <ListItem><ListItemText primary="⚠️ No one on-call." /></ListItem>}
+        </List>
+    );
+};
+
+export const OnCallForScheduleCard = ({ schedule }: { schedule: Schedule }) => {
+
+
     const title = (
-        <div style={ {display: "flex"} }>
+        <div style={{ display: "flex" }}>
             <Tooltip title={schedule.enabled ? 'Enabled' : 'Disabled'}>
                 <div>{schedule.enabled ? <StatusOK /> : <StatusAborted />}</div>
             </Tooltip>
@@ -90,9 +93,10 @@ const OnCallForScheduleCard = ({ schedule }: { schedule: Schedule }) => {
 
     return (
         <Card>
-            <CardHeader title={title} titleTypographyProps={{variant: 'h6'}} />
-
-            <CardContent>{content}</CardContent>
+            <CardHeader title={title} titleTypographyProps={{ variant: 'h6' }} />
+            <CardContent>
+                <OnCallForScheduleList schedule={schedule} />
+            </CardContent>
         </Card>
     );
 };
@@ -123,7 +127,7 @@ const SchedulesGrid = ({ schedules, cardsPerPage }: { schedules: Schedule[], car
             setResults(filtered);
         },
         [debouncedSearch, schedules]
-      );
+    );
 
     return (
         <div>
@@ -142,7 +146,7 @@ const SchedulesGrid = ({ schedules, cardsPerPage }: { schedules: Schedule[], car
                 onChange={e => setSearch(e.target.value)}
             />
 
-            <ItemCardGrid classes={{root: classes.onCallItemGrid}}>
+            <ItemCardGrid classes={{ root: classes.onCallItemGrid }}>
                 {results.filter((_, i) => i >= offset && i < offset + cardsPerPage).map(schedule => <OnCallForScheduleCard key={schedule.id} schedule={schedule} />)}
             </ItemCardGrid>
 

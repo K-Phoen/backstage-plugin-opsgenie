@@ -29,6 +29,7 @@ export interface Opsgenie {
   getIncidentDetailsURL(incident: Incident): string;
 
   getSchedules(): Promise<Schedule[]>;
+  getSchedulesForTeam(name: string): Promise<Schedule[]>;
   getOnCall(scheduleId: string): Promise<OnCallParticipantRef[]>;
 
   getTeams(): Promise<Team[]>;
@@ -168,6 +169,12 @@ export class OpsgenieApi implements Opsgenie {
     const response = await this.fetch<SchedulesResponse>("/v2/schedules");
 
     return response.data;
+  }
+
+  async getSchedulesForTeam(name: string): Promise<Schedule[]> {
+    const response = await this.fetch<SchedulesResponse>("/v2/schedules");
+
+    return response.data.filter(schedule => schedule.ownerTeam.name === name);
   }
 
   async getTeams(): Promise<Team[]> {

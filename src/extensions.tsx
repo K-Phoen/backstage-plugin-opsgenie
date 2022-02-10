@@ -17,3 +17,11 @@ export const EntityOpsgenieAlertsCard = opsGeniePlugin.provide(
     },
   }),
 );
+export const EntityOpsgenieOnCallListCard = opsGeniePlugin.provide(
+  createComponentExtension({
+    name: 'EntityOpsgenieOnCallListCard',
+    component: {
+      lazy: () => import('./components/Entity').then(m => m.OnCallListCard),
+    },
+  }),
+);

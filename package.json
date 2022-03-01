@@ -56,7 +56,7 @@
     "cross-fetch": "^3.0.6",
     "jest-canvas-mock": "^2.3.0",
     "jest-fetch-mock": "^3.0.3",
-    "react": "^16.13.1 ||  || ^17.0.0"
+    "react": "^16.13.1 || ^17.0.0"
   },
   "files": [
     "dist",

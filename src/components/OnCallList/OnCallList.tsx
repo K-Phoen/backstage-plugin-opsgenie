@@ -97,10 +97,8 @@ const OnCallForScheduleCard = ({ schedule }: { schedule: Schedule }) => {
     );
 };
 
-const SchedulesGrid = ({ schedules }: { schedules: Schedule[] }) => {
+const SchedulesGrid = ({ schedules, cardsPerPage }: { schedules: Schedule[], cardsPerPage: number }) => {
     const classes = useStyles();
-    const cardsPerPage = 6;
-
     const [results, setResults] = React.useState(schedules);
     const [search, setSearch] = React.useState("");
     const [page, setPage] = React.useState(1);
@@ -160,7 +158,11 @@ const SchedulesGrid = ({ schedules }: { schedules: Schedule[] }) => {
     );
 };
 
-export const OnCallList = () => {
+export type OnCallListProps = {
+    cardsPerPage?: number;
+};
+
+export const OnCallList = ({ cardsPerPage }: OnCallListProps) => {
     const opsgenieApi = useApi(opsgenieApiRef);
     const { value, loading, error } = useAsync(async () => await opsgenieApi.getSchedules());
 
@@ -174,5 +176,5 @@ export const OnCallList = () => {
         );
     }
 
-    return <SchedulesGrid schedules={value!.filter(schedule => schedule.enabled)} />;
+    return <SchedulesGrid schedules={value!.filter(schedule => schedule.enabled)} cardsPerPage={cardsPerPage || 6} />;
 };

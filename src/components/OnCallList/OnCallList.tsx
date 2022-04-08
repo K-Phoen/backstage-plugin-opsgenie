@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 import { opsgenieApiRef } from '../../api';
 import { useAsync } from "react-use";
 import Alert from "@material-ui/lab/Alert";
@@ -52,7 +52,7 @@ const OnCallForScheduleCard = ({ schedule }: { schedule: Schedule }) => {
     const opsgenieApi = useApi(opsgenieApiRef);
     const { value, loading, error } = useAsync(async () => await opsgenieApi.getOnCall(schedule.id));
 
-    let content: React.ReactFragment;
+    let content: ReactNode;
     if (loading) {
         content = <Progress />
     } else if (error) {

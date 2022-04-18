@@ -34,7 +34,7 @@ const OnCallListCardContent = ({teamName}: OnCallListContentProps) => {
 
     return (
         <div>
-            {value!.map((schedule: Schedule) => <OnCallForScheduleList key={schedule.id} schedule={schedule} />)}
+            {value!.filter(schedule => schedule.enabled).map(schedule => <OnCallForScheduleList key={schedule.id} schedule={schedule} />)}
         </div>
     );
 }

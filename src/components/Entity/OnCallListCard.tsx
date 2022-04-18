@@ -3,12 +3,11 @@ import { useEntity } from '@backstage/plugin-catalog-react';
 import { InfoCard, InfoCardVariants, MissingAnnotationEmptyState } from '@backstage/core-components';
 import { OPSGENIE_TEAM_ANNOTATION } from '../../integration';
 import { opsgenieApiRef } from '../../api';
-import { OnCallForScheduleList } from '../OnCallList'
+import { OnCallForScheduleList } from '../OnCallList/OnCallList';
 import { Progress } from '@backstage/core-components';
 import { useApi } from '@backstage/core-plugin-api';
 import Alert from "@material-ui/lab/Alert";
 import { useAsync } from "react-use";
-import { Schedule } from '../../types';
 
 type OnCallListCardProps = {
     title?: string;
@@ -21,8 +20,7 @@ type OnCallListContentProps = {
 
 const OnCallListCardContent = ({teamName}: OnCallListContentProps) => {
     const opsgenieApi = useApi(opsgenieApiRef);
-
-    const { value, loading, error } = useAsync(async () => await opsgenieApi.getSchedulesForTeam(teamName))
+    const { value, loading, error } = useAsync(async () => await opsgenieApi.getSchedulesForTeam(teamName));
 
     if (loading) {
         return <Progress />;
@@ -33,7 +31,6 @@ const OnCallListCardContent = ({teamName}: OnCallListContentProps) => {
             </Alert>
         );
     }
-
 
     return (
         <div>
@@ -46,14 +43,12 @@ export const OnCallListCard = ({ title, variant }: OnCallListCardProps) => {
     const { entity } = useEntity();
     const teamName = entity.metadata.annotations?.[OPSGENIE_TEAM_ANNOTATION];
 
-
-    if (!teamName){
-        return (
-            <MissingAnnotationEmptyState annotation={OPSGENIE_TEAM_ANNOTATION} />
-        );
+    if (!teamName) {
+        return <MissingAnnotationEmptyState annotation={OPSGENIE_TEAM_ANNOTATION} />;
     }
+
     return (
-        <InfoCard title={title || "Opsgenie Who Is On-Call"} variant={variant || "gridItem"}>
+        <InfoCard title={title || "Opsgenie – Who is on-call?"} variant={variant || "gridItem"}>
             <OnCallListCardContent teamName={teamName} />
         </InfoCard>
     )

@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { opsgenieApiRef } from '../../api';
 import { useAsync } from "react-use";
 import Alert from "@material-ui/lab/Alert";
@@ -7,7 +7,6 @@ import PersonIcon from '@material-ui/icons/Person';
 import { Schedule } from '../../types';
 import { Pagination } from '@material-ui/lab';
 import SearchIcon from '@material-ui/icons/Search';
-
 import { useApi } from '@backstage/core-plugin-api';
 import { Progress, ItemCardGrid, StatusOK, StatusAborted } from '@backstage/core-components';
 
@@ -53,7 +52,7 @@ export const OnCallForScheduleList = ({ schedule }: { schedule: Schedule }) => {
     const { value, loading, error } = useAsync(async () => await opsgenieApi.getOnCall(schedule.id));
 
     if (loading) {
-        return <Progress />
+        return <Progress />;
     } else if (error) {
         return (
             <Alert data-testid="error-message" severity="error">
@@ -80,8 +79,6 @@ export const OnCallForScheduleList = ({ schedule }: { schedule: Schedule }) => {
 };
 
 export const OnCallForScheduleCard = ({ schedule }: { schedule: Schedule }) => {
-
-
     const title = (
         <div style={{ display: "flex" }}>
             <Tooltip title={schedule.enabled ? 'Enabled' : 'Disabled'}>

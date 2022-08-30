@@ -31,7 +31,7 @@
     "dom-to-image": "^2.6.0",
     "history": "^5.0.0",
     "js-file-download": "^0.4.12",
-    "moment": "^2.29.1",
+    "moment": "^2.29.4",
     "react-router": "6.0.0-beta.0",
     "react-router-dom": "6.0.0-beta.0",
     "react-use": "^17.2.4",

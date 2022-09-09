@@ -69,11 +69,11 @@ export const OnCallForScheduleList = ({ schedule }: { schedule: Schedule }) => {
                         <PersonIcon />
                     </ListItemIcon>
 
-                    <ListItemText primary={responder.name} />
+                    <ListItemText primary={responder.name - (schedule.name)} />
                 </ListItem>
             ))}
 
-            {value!.length === 0 && <ListItem><ListItemText primary="⚠️ No one on-call." /></ListItem>}
+            {value!.length === 0 && <ListItem><ListItemText primary={"⚠️ No one on-call for schedule '" + schedule.name + "'."} /></ListItem>}
         </List>
     );
 };

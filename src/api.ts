@@ -174,7 +174,7 @@ export class OpsgenieApi implements Opsgenie {
   async getSchedulesForTeam(name: string): Promise<Schedule[]> {
     const response = await this.fetch<SchedulesResponse>("/v2/schedules");
 
-    return response.data.filter(schedule => schedule.ownerTeam.name === name);
+    return response.data.filter(schedule => schedule.ownerTeam && schedule.ownerTeam.name === name);
   }
 
   async getTeams(): Promise<Team[]> {

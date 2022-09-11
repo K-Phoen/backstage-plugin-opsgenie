@@ -4,7 +4,7 @@ import { useAsync } from "react-use";
 import Alert from "@material-ui/lab/Alert";
 import { Card, CardContent, CardHeader, createStyles, TextField, InputAdornment, List, ListItem, ListItemIcon, ListItemText, makeStyles, Tooltip } from '@material-ui/core';
 import PersonIcon from '@material-ui/icons/Person';
-import { Schedule } from '../../types';
+import { OnCallParticipantRef, Schedule } from '../../types';
 import { Pagination } from '@material-ui/lab';
 import SearchIcon from '@material-ui/icons/Search';
 import { useApi } from '@backstage/core-plugin-api';
@@ -23,6 +23,12 @@ const useStyles = makeStyles((theme) =>
         }
     }),
 );
+
+type ResponderTitleFormatter = (responder: OnCallParticipantRef, schedule: Schedule) => string;
+
+const defaultResponderTitle = (responder: OnCallParticipantRef, _: Schedule) => {
+    return responder.name;
+};
 
 const useDebounce = (value: string, delay: number) => {
     const [debouncedValue, setDebouncedValue] = React.useState(value);
@@ -47,7 +53,12 @@ const useDebounce = (value: string, delay: number) => {
     return debouncedValue;
 }
 
-export const OnCallForScheduleList = ({ schedule }: { schedule: Schedule }) => {
+export type OnCallForScheduleListProps = {
+    schedule: Schedule;
+    responderFormatter?: ResponderTitleFormatter,
+};
+
+export const OnCallForScheduleList = ({ schedule, responderFormatter }: OnCallForScheduleListProps) => {
     const opsgenieApi = useApi(opsgenieApiRef);
     const { value, loading, error } = useAsync(async () => await opsgenieApi.getOnCall(schedule.id));
 
@@ -61,6 +72,8 @@ export const OnCallForScheduleList = ({ schedule }: { schedule: Schedule }) => {
         );
     }
 
+    const titleFormatter = responderFormatter || defaultResponderTitle;
+
     return (
         <List>
             {value!.map((responder, i) => (
@@ -69,16 +82,16 @@ export const OnCallForScheduleList = ({ schedule }: { schedule: Schedule }) => {
                         <PersonIcon />
                     </ListItemIcon>
 
-                    <ListItemText primary={responder.name - (schedule.name)} />
+                    <ListItemText primary={titleFormatter(responder, schedule)} />
                 </ListItem>
             ))}
 
-            {value!.length === 0 && <ListItem><ListItemText primary={"⚠️ No one on-call for schedule '" + schedule.name + "'."} /></ListItem>}
+            {value!.length === 0 && <ListItem><ListItemText primary={`⚠️ No one on-call for schedule "${schedule.name}".`} /></ListItem>}
         </List>
     );
 };
 
-export const OnCallForScheduleCard = ({ schedule }: { schedule: Schedule }) => {
+export const OnCallForScheduleCard = ({ schedule, responderFormatter }: { schedule: Schedule, responderFormatter?: ResponderTitleFormatter }) => {
     const title = (
         <div style={{ display: "flex" }}>
             <Tooltip title={schedule.enabled ? 'Enabled' : 'Disabled'}>
@@ -92,13 +105,13 @@ export const OnCallForScheduleCard = ({ schedule }: { schedule: Schedule }) => {
         <Card>
             <CardHeader title={title} titleTypographyProps={{ variant: 'h6' }} />
             <CardContent>
-                <OnCallForScheduleList schedule={schedule} />
+                <OnCallForScheduleList schedule={schedule} responderFormatter={responderFormatter} />
             </CardContent>
         </Card>
     );
 };
 
-const SchedulesGrid = ({ schedules, cardsPerPage }: { schedules: Schedule[], cardsPerPage: number }) => {
+const SchedulesGrid = ({ schedules, cardsPerPage, responderFormatter }: { schedules: Schedule[], cardsPerPage: number, responderFormatter?: ResponderTitleFormatter }) => {
     const classes = useStyles();
     const [results, setResults] = React.useState(schedules);
     const [search, setSearch] = React.useState("");
@@ -144,7 +157,7 @@ const SchedulesGrid = ({ schedules, cardsPerPage }: { schedules: Schedule[], car
             />
 
             <ItemCardGrid classes={{ root: classes.onCallItemGrid }}>
-                {results.filter((_, i) => i >= offset && i < offset + cardsPerPage).map(schedule => <OnCallForScheduleCard key={schedule.id} schedule={schedule} />)}
+                {results.filter((_, i) => i >= offset && i < offset + cardsPerPage).map(schedule => <OnCallForScheduleCard key={schedule.id} schedule={schedule} responderFormatter={responderFormatter} />)}
             </ItemCardGrid>
 
             <Pagination
@@ -161,9 +174,10 @@ const SchedulesGrid = ({ schedules, cardsPerPage }: { schedules: Schedule[], car
 
 export type OnCallListProps = {
     cardsPerPage?: number;
+    responderFormatter?: ResponderTitleFormatter;
 };
 
-export const OnCallList = ({ cardsPerPage }: OnCallListProps) => {
+export const OnCallList = ({ cardsPerPage, responderFormatter }: OnCallListProps) => {
     const opsgenieApi = useApi(opsgenieApiRef);
     const { value, loading, error } = useAsync(async () => await opsgenieApi.getSchedules());
 
@@ -177,5 +191,5 @@ export const OnCallList = ({ cardsPerPage }: OnCallListProps) => {
         );
     }
 
-    return <SchedulesGrid schedules={value!.filter(schedule => schedule.enabled)} cardsPerPage={cardsPerPage || 6} />;
+    return <SchedulesGrid schedules={value!.filter(schedule => schedule.enabled)} cardsPerPage={cardsPerPage || 6} responderFormatter={responderFormatter} />;
 };

@@ -24,6 +24,7 @@ export const opsGeniePlugin = createPlugin({
           discoveryApi: discoveryApi,
           identityApi: identityApi,
           domain: configApi.getString('opsgenie.domain'),
+          readOnly: configApi.getOptionalBoolean('opsgenie.readOnly') ?? false,
           proxyPath: configApi.getOptionalString('opsgenie.proxyPath'),
         });
       },

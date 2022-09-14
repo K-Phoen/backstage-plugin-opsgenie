@@ -14,6 +14,13 @@ export interface Config {
         proxyPath?: string;
 
         /**
+         * If OpsGenie token has only read rights, you have to set it to true.
+         * Some options would be disabled on a view part.
+         * @visibility frontend
+         */
+        readOnly?: boolean;
+
+        /**
          * Configuration options used to generate analytics graphs
          * @visibility frontend
          */

@@ -35,6 +35,8 @@ export interface Opsgenie {
   getTeams(): Promise<Team[]>;
 
   getUserDetailsURL(userId: string): string;
+
+  isReadOnly(): boolean;
 }
 
 interface AlertsResponse {
@@ -77,6 +79,11 @@ type Options = {
   domain: string;
 
   /**
+   * If used token for OpsGenie has only read rights, you have to set it to true.
+   */
+  readOnly: boolean;
+
+  /**
    * Path to use for requests via the proxy, defaults to /opsgenie/api
    */
   proxyPath?: string;
@@ -90,12 +97,14 @@ export class OpsgenieApi implements Opsgenie {
   private readonly identityApi: IdentityApi;
   private readonly proxyPath: string;
   private readonly domain: string;
+  private readonly readOnly: boolean;
 
   constructor(opts: Options) {
     this.discoveryApi = opts.discoveryApi;
     this.identityApi = opts.identityApi;
     this.domain = opts.domain;
     this.proxyPath = opts.proxyPath ?? DEFAULT_PROXY_PATH;
+    this.readOnly = opts.readOnly;
   }
 
   private async fetch<T = any>(input: string, init?: RequestInit): Promise<T> {
@@ -199,6 +208,10 @@ export class OpsgenieApi implements Opsgenie {
 
   getUserDetailsURL(userId: string): string {
     return `${this.domain}/settings/users/${userId}/detail`;
+  }
+
+  isReadOnly(): boolean {
+    return this.readOnly;
   }
 
   private async apiUrl() {

@@ -5,12 +5,7 @@ export const opsgenieApiRef = createApiRef<Opsgenie>({
   id: 'plugin.opsgenie.service',
 });
 
-type AlertsFetchOpts = {
-  limit?: number
-  query?: string
-}
-
-type IncidentsFetchOpts = {
+type fetchOpts = {
   limit?: number
   query?: string;
   sort?: string;
@@ -18,8 +13,8 @@ type IncidentsFetchOpts = {
 }
 
 export interface Opsgenie {
-  getAlerts(opts?: AlertsFetchOpts): Promise<Alert[]>;
-  getIncidents(opts?: IncidentsFetchOpts): Promise<Incident[]>;
+  getAlerts(opts?: fetchOpts): Promise<Alert[]>;
+  getIncidents(opts?: fetchOpts): Promise<Incident[]>;
 
   getAlertDetailsURL(alert: Alert): string;
 
@@ -39,6 +34,11 @@ export interface Opsgenie {
 
 interface AlertsResponse {
   data: Alert[];
+  paging: {
+    first: string;
+    next?: string;
+    last: string;
+  };
 }
 
 interface IncidentsResponse {
@@ -118,15 +118,26 @@ export class OpsgenieApi implements Opsgenie {
     if (!resp.ok) throw new Error(`Request failed with ${resp.status}: ${resp.statusText}`);
   }
 
-  async getAlerts(opts?: AlertsFetchOpts): Promise<Alert[]> {
+  async getAlerts(opts?: fetchOpts): Promise<Alert[]> {
     const limit = opts?.limit || 50;
+    const sort = opts?.sort || 'createdAt';
+    const order = opts?.order || 'desc';
     const query = opts?.query ? `&query=${opts?.query}` : '';
-    const response = await this.fetch<AlertsResponse>(`/v2/alerts?limit=${limit}${query}`);
 
-    return response.data;
+    let response = await this.fetch<AlertsResponse>(`/v2/alerts?limit=${limit}&sort=${sort}&order=${order}${query}`);
+    let alerts = response.data;
+
+    while (response.paging.next) {
+      const parsedUrl = new URL(response.paging.next);
+      response = await this.fetch(parsedUrl.pathname + parsedUrl.search);
+
+      alerts = alerts.concat(response.data);
+    }
+
+    return alerts;
   }
 
-  async getIncidents(opts?: IncidentsFetchOpts): Promise<Incident[]> {
+  async getIncidents(opts?: fetchOpts): Promise<Incident[]> {
     const limit = opts?.limit || 50;
     const sort = opts?.sort || 'createdAt';
     const order = opts?.order || 'desc';

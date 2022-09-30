@@ -30,6 +30,7 @@ export interface Opsgenie {
 
   getSchedules(): Promise<Schedule[]>;
   getSchedulesForTeam(name: string): Promise<Schedule[]>;
+  getSchedulesByName(name: string): Promise<Schedule[]>;
   getOnCall(scheduleId: string): Promise<OnCallParticipantRef[]>;
 
   getTeams(): Promise<Team[]>;
@@ -175,6 +176,12 @@ export class OpsgenieApi implements Opsgenie {
     const response = await this.fetch<SchedulesResponse>("/v2/schedules");
 
     return response.data.filter(schedule => schedule.ownerTeam && schedule.ownerTeam.name === name);
+  }
+
+  async getSchedulesByName(name: string): Promise<Schedule[]> {
+    const response = await this.fetch<SchedulesResponse>("/v2/schedules");
+
+    return response.data.filter(schedule => schedule.name === name);
   }
 
   async getTeams(): Promise<Team[]> {

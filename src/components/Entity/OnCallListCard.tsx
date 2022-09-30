@@ -1,7 +1,7 @@
 import React from 'react';
 import { useEntity } from '@backstage/plugin-catalog-react';
 import { InfoCard, InfoCardVariants, MissingAnnotationEmptyState } from '@backstage/core-components';
-import { OPSGENIE_TEAM_ANNOTATION } from '../../integration';
+import { OPSGENIE_IS_SCHEDULE_ANNOTATION, OPSGENIE_TEAM_ANNOTATION } from '../../integration';
 import { opsgenieApiRef } from '../../api';
 import { OnCallForScheduleList } from '../OnCallList/OnCallList';
 import { Progress } from '@backstage/core-components';
@@ -16,11 +16,18 @@ type OnCallListCardProps = {
 
 type OnCallListContentProps = {
     teamName: string;
+    isSchedule: boolean;
 }
 
-const OnCallListCardContent = ({teamName}: OnCallListContentProps) => {
+const OnCallListCardContent = ({teamName, isSchedule}: OnCallListContentProps) => {
     const opsgenieApi = useApi(opsgenieApiRef);
-    const { value, loading, error } = useAsync(async () => await opsgenieApi.getSchedulesForTeam(teamName));
+
+    const {value, loading, error} = useAsync(async () => {
+        if (isSchedule) {
+            return await opsgenieApi.getSchedulesByName(teamName);
+        }
+        return await opsgenieApi.getSchedulesForTeam(teamName);
+    });
 
     if (loading) {
         return <Progress />;
@@ -42,6 +49,7 @@ const OnCallListCardContent = ({teamName}: OnCallListContentProps) => {
 export const OnCallListCard = ({ title, variant }: OnCallListCardProps) => {
     const { entity } = useEntity();
     const teamName = entity.metadata.annotations?.[OPSGENIE_TEAM_ANNOTATION];
+    let isSchedule = entity.metadata.annotations?.[OPSGENIE_IS_SCHEDULE_ANNOTATION]?.toLowerCase() === 'true' || false;
 
     if (!teamName) {
         return <MissingAnnotationEmptyState annotation={OPSGENIE_TEAM_ANNOTATION} />;
@@ -49,7 +57,7 @@ export const OnCallListCard = ({ title, variant }: OnCallListCardProps) => {
 
     return (
         <InfoCard title={title || "Opsgenie – Who is on-call?"} variant={variant || "gridItem"}>
-            <OnCallListCardContent teamName={teamName} />
+            <OnCallListCardContent teamName={teamName} isSchedule={isSchedule}/>
         </InfoCard>
     )
 };

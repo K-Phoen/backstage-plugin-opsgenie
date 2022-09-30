@@ -49,7 +49,7 @@ const OnCallListCardContent = ({teamName, isSchedule}: OnCallListContentProps) =
 export const OnCallListCard = ({ title, variant }: OnCallListCardProps) => {
     const { entity } = useEntity();
     const teamName = entity.metadata.annotations?.[OPSGENIE_TEAM_ANNOTATION];
-    let isSchedule = entity.metadata.annotations?.[OPSGENIE_IS_SCHEDULE_ANNOTATION]?.toLowerCase() === 'true' || false;
+    const isSchedule = entity.metadata.annotations?.[OPSGENIE_IS_SCHEDULE_ANNOTATION]?.toLowerCase() === 'true' || false;
 
     if (!teamName) {
         return <MissingAnnotationEmptyState annotation={OPSGENIE_TEAM_ANNOTATION} />;

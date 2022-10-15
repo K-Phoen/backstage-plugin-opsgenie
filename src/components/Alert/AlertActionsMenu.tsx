@@ -71,7 +71,7 @@ export const AlertActionsMenu = ({ alert, onAlertChanged }: { alert: Alert, onAl
                     style: {maxHeight: 48 * 4.5,},
                 }}
             >
-                {!alert.acknowledged && alert.status !== 'closed' &&
+                {!alert.acknowledged && alert.status !== 'closed' && !opsgenieApi.isReadOnly() &&
                     (<MenuItem key="ack" onClick={handleAcknowledge}>
                         <ListItemIcon>
                             <DoneAll fontSize="small" />
@@ -82,7 +82,7 @@ export const AlertActionsMenu = ({ alert, onAlertChanged }: { alert: Alert, onAl
                     </MenuItem>)
                 }
 
-                {alert.status !== 'closed' &&
+                {alert.status !== 'closed' && !opsgenieApi.isReadOnly() &&
                     (<MenuItem key="close" onClick={handleCloseAlert}>
                         <ListItemIcon>
                             <CheckCircleIcon fontSize="small" />

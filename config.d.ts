@@ -14,6 +14,14 @@ export interface Config {
         proxyPath?: string;
 
         /**
+         * Enables "read-only" mode on the plugin. In this mode, actions such as acknowledging or closing an alert will be disabled.
+         * Enable this if you only want to expose Opsgenie-originated information or if the API token you use has only read permissions.
+         *
+         * @visibility frontend
+         */
+        readOnly?: boolean;
+
+        /**
          * Configuration options used to generate analytics graphs
          * @visibility frontend
          */

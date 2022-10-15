@@ -155,6 +155,9 @@ export class OpsgenieApi implements Opsgenie {
   }
 
   async acknowledgeAlert(alert: Alert): Promise<void> {
+    if (this.isReadOnly()) {
+      throw new Error('You can\'t acknowledge an alert in read-only mode.');
+    }
     const init = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -165,6 +168,9 @@ export class OpsgenieApi implements Opsgenie {
   }
 
   async closeAlert(alert: Alert): Promise<void> {
+    if (this.isReadOnly()) {
+      throw new Error('You can\'t close an alert in read-only mode.');
+    }
     const init = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

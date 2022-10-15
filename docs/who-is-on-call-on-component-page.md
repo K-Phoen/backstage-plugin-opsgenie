@@ -44,3 +44,12 @@ annotations:
 ```
 
 This annotation accepts any valid OpsGenie team name.
+
+If your OpsGenie teams do not directly own schedules (ie. shared schedule), specify the schedule name instead of a team
+name and add an annotation to specify that the team name is actually a schedule:
+
+```yml
+annotations:
+  opsgenie.com/team: 'Awesome Schedule'
+  opsgenie.com/isSchedule: 'true'
+```

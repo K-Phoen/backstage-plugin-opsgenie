@@ -3,14 +3,14 @@ import { makeStyles } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
   tooltip: {
-      backgroundColor: theme.palette.background.default,
-      paddingLeft: '1rem',
-      paddingRight: '1rem',
-      paddingBottom: '0.5rem',
-      paddingTop: '0.5rem',
-      borderRadius: '5px',
-      border: '1px solid white',
-      borderColor: theme.palette.grey[300],
+    backgroundColor: theme.palette.background.default,
+    paddingLeft: '1rem',
+    paddingRight: '1rem',
+    paddingBottom: '0.5rem',
+    paddingTop: '0.5rem',
+    borderRadius: '5px',
+    border: '1px solid white',
+    borderColor: theme.palette.grey[300],
   },
 }));
 
@@ -41,7 +41,7 @@ export const FilterZeroTooltip = (props: any) => {
     }
 
     return (
-      <p key={row.dataKey} style={{color: row.fill}}>
+      <p key={row.dataKey} style={{ color: row.fill }}>
         {`${name}: ${value}`}
       </p>);
   });

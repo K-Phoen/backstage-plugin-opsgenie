@@ -490,7 +490,7 @@ export class AnalitycsApi implements Analytics {
     const data = Object.keys(incidentsBuckets).map(quarter => {
       const dataPoint: any = {
         period: quarter,
-        total:incidentsBuckets[quarter].total,
+        total: incidentsBuckets[quarter].total,
         date: incidentsBuckets[quarter].date,
       };
 

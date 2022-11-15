@@ -1,3 +1,4 @@
+import React from 'react';
 import { BackstageTheme } from '@backstage/theme';
 import {
   Accordion,
@@ -9,7 +10,6 @@ import {
 } from '@material-ui/core';
 import ErrorOutline from '@material-ui/icons/ErrorOutline';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import React from 'react';
 
 const useErrorOutlineStyles = makeStyles<BackstageTheme>(theme => ({
   root: {

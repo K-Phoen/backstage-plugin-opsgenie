@@ -9,5 +9,5 @@ export type OpsgeniePageProps = {
 export const OpsgeniePage = ({ onCallListCardsCount }: OpsgeniePageProps) => {
   const outlet = useOutlet();
 
-  return outlet || <DefaultOpsgeniePage onCallListCardsCount={onCallListCardsCount}/>;
+  return outlet || <DefaultOpsgeniePage onCallListCardsCount={onCallListCardsCount} />;
 };

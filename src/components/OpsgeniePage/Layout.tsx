@@ -1,8 +1,7 @@
-import { TabProps } from '@material-ui/core';
 import { Children, default as React, Fragment, isValidElement } from 'react';
-
 import { attachComponentData } from '@backstage/core-plugin-api';
 import { Header, Page, RoutedTabs } from '@backstage/core-components';
+import { TabProps } from '@material-ui/core';
 
 type SubRoute = {
   path: string;
@@ -50,7 +49,7 @@ type LayoutProps = {
   children?: React.ReactNode;
 };
 
-export const Layout = ({children}: LayoutProps) => {
+export const Layout = ({ children }: LayoutProps) => {
   const routes = createSubRoutesFromChildren(children);
 
   return (

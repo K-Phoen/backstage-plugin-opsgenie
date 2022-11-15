@@ -5,23 +5,23 @@ import { OPSGENIE_ANNOTATION } from '../../integration';
 import { AlertsSummary } from '../AlertsSummary';
 
 type AlertsCardProps = {
-    title?: string;
-    variant?: InfoCardVariants;
+  title?: string;
+  variant?: InfoCardVariants;
 };
 
 export const AlertsCard = ({ title, variant }: AlertsCardProps) => {
-    const { entity } = useEntity();
-    const query = entity.metadata.annotations?.[OPSGENIE_ANNOTATION];
+  const { entity } = useEntity();
+  const query = entity.metadata.annotations?.[OPSGENIE_ANNOTATION];
 
-    if (!query) {
-        return (
-            <MissingAnnotationEmptyState annotation={OPSGENIE_ANNOTATION} />
-        );
-    }
-
+  if (!query) {
     return (
-        <InfoCard title={title || "Opsgenie — Alerts"} variant={variant || "gridItem"}>
-            <AlertsSummary query={query} />
-        </InfoCard>
+      <MissingAnnotationEmptyState annotation={OPSGENIE_ANNOTATION} />
     );
+  }
+
+  return (
+    <InfoCard title={title || "Opsgenie — Alerts"} variant={variant || "gridItem"}>
+      <AlertsSummary query={query} />
+    </InfoCard>
+  );
 };

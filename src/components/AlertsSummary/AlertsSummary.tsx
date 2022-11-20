@@ -12,6 +12,7 @@ import { AlertStatus, AlertActionsMenu } from '../Alert';
 const useStyles = makeStyles({
   listItemPrimary: {
     fontWeight: 'bold',
+    whiteSpace: 'normal',
   },
   listItemIcon: {
     minWidth: '1em',

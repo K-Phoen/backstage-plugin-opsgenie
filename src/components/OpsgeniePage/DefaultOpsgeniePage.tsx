@@ -6,11 +6,11 @@ import { Analytics } from '../Analytics';
 import { Layout } from './Layout';
 import { OpsgeniePageProps } from "./OpsgeniePage";
 
-export const DefaultOpsgeniePage = ({ onCallListCardsCount }: OpsgeniePageProps) => {
+export const DefaultOpsgeniePage = ({ onCallListCardsCount, onCallUseScheduleName }: OpsgeniePageProps) => {
   return (
     <Layout>
       <Layout.Route path="who-is-on-call" title="Who is on-call">
-        <OnCallList cardsPerPage={onCallListCardsCount} />
+        <OnCallList cardsPerPage={onCallListCardsCount} useScheduleName={onCallUseScheduleName}/>
       </Layout.Route>
       <Layout.Route path="alerts" title="Alerts">
         <AlertsList />

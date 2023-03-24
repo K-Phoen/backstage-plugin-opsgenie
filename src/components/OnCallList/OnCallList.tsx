@@ -91,13 +91,13 @@ export const OnCallForScheduleList = ({ schedule, responderFormatter }: OnCallFo
   );
 };
 
-export const OnCallForScheduleCard = ({ schedule, responderFormatter }: { schedule: Schedule, responderFormatter?: ResponderTitleFormatter }) => {
+export const OnCallForScheduleCard = ({ schedule, useScheduleName, responderFormatter }: { schedule: Schedule, useScheduleName: boolean, responderFormatter?: ResponderTitleFormatter }) => {
   const title = (
     <div style={{ display: "flex" }}>
       <Tooltip title={schedule.enabled ? 'Enabled' : 'Disabled'}>
         <div>{schedule.enabled ? <StatusOK /> : <StatusAborted />}</div>
       </Tooltip>
-      {schedule.ownerTeam.name}
+      {useScheduleName ? schedule.name : schedule.ownerTeam.name}
     </div>
   );
 
@@ -111,7 +111,7 @@ export const OnCallForScheduleCard = ({ schedule, responderFormatter }: { schedu
   );
 };
 
-const SchedulesGrid = ({ schedules, cardsPerPage, responderFormatter }: { schedules: Schedule[], cardsPerPage: number, responderFormatter?: ResponderTitleFormatter }) => {
+const SchedulesGrid = ({ schedules, cardsPerPage, responderFormatter, useScheduleName }: { schedules: Schedule[], cardsPerPage: number, useScheduleName: boolean, responderFormatter?: ResponderTitleFormatter }) => {
   const classes = useStyles();
   const [results, setResults] = React.useState(schedules);
   const [search, setSearch] = React.useState("");
@@ -157,7 +157,7 @@ const SchedulesGrid = ({ schedules, cardsPerPage, responderFormatter }: { schedu
       />
 
       <ItemCardGrid classes={{ root: classes.onCallItemGrid }}>
-        {results.filter((_, i) => i >= offset && i < offset + cardsPerPage).map(schedule => <OnCallForScheduleCard key={schedule.id} schedule={schedule} responderFormatter={responderFormatter} />)}
+        {results.filter((_, i) => i >= offset && i < offset + cardsPerPage).map(schedule => <OnCallForScheduleCard key={schedule.id} schedule={schedule} responderFormatter={responderFormatter} useScheduleName={useScheduleName} />)}
       </ItemCardGrid>
 
       <Pagination
@@ -175,9 +175,10 @@ const SchedulesGrid = ({ schedules, cardsPerPage, responderFormatter }: { schedu
 export type OnCallListProps = {
   cardsPerPage?: number;
   responderFormatter?: ResponderTitleFormatter;
+  useScheduleName?: boolean;
 };
 
-export const OnCallList = ({ cardsPerPage, responderFormatter }: OnCallListProps) => {
+export const OnCallList = ({ cardsPerPage, responderFormatter, useScheduleName }: OnCallListProps) => {
   const opsgenieApi = useApi(opsgenieApiRef);
   const { value, loading, error } = useAsync(async () => await opsgenieApi.getSchedules());
 
@@ -191,5 +192,5 @@ export const OnCallList = ({ cardsPerPage, responderFormatter }: OnCallListProps
     );
   }
 
-  return <SchedulesGrid schedules={value!.filter(schedule => schedule.enabled)} cardsPerPage={cardsPerPage || 6} responderFormatter={responderFormatter} />;
+  return <SchedulesGrid schedules={value!.filter(schedule => schedule.enabled)} cardsPerPage={cardsPerPage || 6} responderFormatter={responderFormatter} useScheduleName={useScheduleName || false} />;
 };

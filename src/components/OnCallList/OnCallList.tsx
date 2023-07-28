@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useAsync } from "react-use";
-import { useApi } from '@backstage/core-plugin-api';
+import { ApiRef, useApi } from '@backstage/core-plugin-api';
 import { Progress, ItemCardGrid, StatusOK, StatusAborted } from '@backstage/core-components';
 import Alert from "@material-ui/lab/Alert";
 import { Card, CardContent, CardHeader, createStyles, TextField, InputAdornment, List, ListItem, ListItemIcon, ListItemText, makeStyles, Tooltip } from '@material-ui/core';
@@ -8,7 +8,7 @@ import PersonIcon from '@material-ui/icons/Person';
 import { Pagination } from '@material-ui/lab';
 import SearchIcon from '@material-ui/icons/Search';
 import { OnCallParticipantRef, Schedule } from '../../types';
-import { opsgenieApiRef } from '../../api';
+import { Opsgenie, opsgenieApiRef } from '../../api';
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -56,10 +56,11 @@ const useDebounce = (value: string, delay: number) => {
 export type OnCallForScheduleListProps = {
   schedule: Schedule;
   responderFormatter?: ResponderTitleFormatter,
+  ref?: ApiRef<Opsgenie>
 };
 
-export const OnCallForScheduleList = ({ schedule, responderFormatter }: OnCallForScheduleListProps) => {
-  const opsgenieApi = useApi(opsgenieApiRef);
+export const OnCallForScheduleList = ({ schedule, responderFormatter, ref = opsgenieApiRef }: OnCallForScheduleListProps) => {
+  const opsgenieApi = useApi(ref);
   const { value, loading, error } = useAsync(async () => await opsgenieApi.getOnCall(schedule.id));
 
   if (loading) {
@@ -175,10 +176,11 @@ const SchedulesGrid = ({ schedules, cardsPerPage, responderFormatter }: { schedu
 export type OnCallListProps = {
   cardsPerPage?: number;
   responderFormatter?: ResponderTitleFormatter;
+  ref?: ApiRef<Opsgenie>;
 };
 
-export const OnCallList = ({ cardsPerPage, responderFormatter }: OnCallListProps) => {
-  const opsgenieApi = useApi(opsgenieApiRef);
+export const OnCallList = ({ cardsPerPage, responderFormatter, ref = opsgenieApiRef }: OnCallListProps) => {
+  const opsgenieApi = useApi(ref);
   const { value, loading, error } = useAsync(async () => await opsgenieApi.getSchedules());
 
   if (loading) {

@@ -1,16 +1,16 @@
 import React from 'react';
-import { alertApiRef, useApi } from '@backstage/core-plugin-api';
+import { ApiRef, alertApiRef, useApi } from '@backstage/core-plugin-api';
 import { IconButton, ListItemIcon, Menu, MenuItem, Typography } from '@material-ui/core';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 import DoneAll from '@material-ui/icons/DoneAll';
-import { opsgenieApiRef } from '../../api';
+import { Opsgenie, opsgenieApiRef } from '../../api';
 import { Alert } from '../../types';
 import { Link } from '@backstage/core-components';
 
-export const AlertActionsMenu = ({ alert, onAlertChanged }: { alert: Alert, onAlertChanged?: (alert: Alert) => void }) => {
-  const opsgenieApi = useApi(opsgenieApiRef);
+export const AlertActionsMenu = ({ alert, onAlertChanged, ref = opsgenieApiRef }: { alert: Alert, ref?: ApiRef<Opsgenie>, onAlertChanged?: (alert: Alert) => void }) => {
+  const opsgenieApi = useApi(ref);
   const alertApi = useApi(alertApiRef);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const callback = onAlertChanged || ((_: Alert): void => { });

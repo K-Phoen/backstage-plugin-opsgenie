@@ -8,8 +8,8 @@ import { Alert } from '../../types';
 import { StatusChip } from './StatusChip';
 import { PriorityChip } from '../UI/PriorityChip';
 
-export const AlertsTable = ({ alerts }: { alerts: Alert[] }) => {
-  const opsgenieApi = useApi(opsgenieApiRef);
+export const AlertsTable = ({ alerts, ref = opsgenieApiRef }: { ref?: ApiRef<Opsgenie>, alerts: Alert[] }) => {
+  const opsgenieApi = useApi(ref);
   const smallColumnStyle = {
     width: '5%',
     maxWidth: '5%',

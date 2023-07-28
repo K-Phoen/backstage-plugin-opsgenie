@@ -1,14 +1,13 @@
 import React from 'react';
 import { useAsync } from "react-use";
-import { useApi } from '@backstage/core-plugin-api';
+import { ApiRef, useApi } from '@backstage/core-plugin-api';
 import { Progress } from '@backstage/core-components';
 import Alert from "@material-ui/lab/Alert";
 import { AlertsTable } from './AlertsTable';
-import { opsgenieApiRef } from '../../api';
+import { Opsgenie, opsgenieApiRef } from '../../api';
 
-export const AlertsList = () => {
-  const opsgenieApi = useApi(opsgenieApiRef);
-
+export const AlertsList = ({ref = opsgenieApiRef}: {ref?: ApiRef<Opsgenie> }) => {
+  const opsgenieApi = useApi(ref);
   const { value, loading, error } = useAsync(async () => await opsgenieApi.getAlerts());
 
   if (loading) {

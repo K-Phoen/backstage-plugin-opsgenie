@@ -5,9 +5,10 @@ import { Progress } from '@backstage/core-components';
 import { useApi } from '@backstage/core-plugin-api';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, makeStyles, Typography } from '@material-ui/core';
 import { Alert as AlertUI } from '@material-ui/lab';
-import { opsgenieApiRef } from '../../api';
+import { Opsgenie, opsgenieApiRef } from '../../api';
 import { Alert } from '../../types';
 import { AlertStatus, AlertActionsMenu } from '../Alert';
+import { ApiRef } from '@backstage/core-plugin-api';
 
 const useStyles = makeStyles({
   listItemPrimary: {
@@ -63,8 +64,8 @@ const AlertsSummaryTable = ({ alerts }: { alerts: Alert[] }) => {
   );
 };
 
-export const AlertsSummary = ({ query }: { query: string }) => {
-  const opsgenieApi = useApi(opsgenieApiRef);
+export const AlertsSummary = ({ query, ref = opsgenieApiRef }: { query: string, ref?: ApiRef<Opsgenie> }) => {
+  const opsgenieApi = useApi(ref);
   const { value, loading, error } = useAsync(async () => await opsgenieApi.getAlerts({ limit: 3, query: query }));
 
   if (loading) {

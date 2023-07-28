@@ -3,10 +3,10 @@ import { useAsync } from "react-use";
 import { useEntity } from '@backstage/plugin-catalog-react';
 import { InfoCard, InfoCardVariants, MissingAnnotationEmptyState } from '@backstage/core-components';
 import { Progress } from '@backstage/core-components';
-import { useApi } from '@backstage/core-plugin-api';
+import { ApiRef, useApi } from '@backstage/core-plugin-api';
 import Alert from "@material-ui/lab/Alert";
 import { OPSGENIE_TEAM_ANNOTATION } from '../../integration';
-import { opsgenieApiRef } from '../../api';
+import { Opsgenie, opsgenieApiRef } from '../../api';
 import { OnCallForScheduleList } from '../OnCallList/OnCallList';
 
 type OnCallListCardProps = {
@@ -16,10 +16,11 @@ type OnCallListCardProps = {
 
 type OnCallListContentProps = {
   teamName: string;
+  ref?: ApiRef<Opsgenie>
 }
 
-const OnCallListCardContent = ({ teamName }: OnCallListContentProps) => {
-  const opsgenieApi = useApi(opsgenieApiRef);
+const OnCallListCardContent = ({ teamName, ref = opsgenieApiRef }: OnCallListContentProps) => {
+  const opsgenieApi = useApi(ref);
   const { value, loading, error } = useAsync(async () => await opsgenieApi.getSchedulesForTeam(teamName));
 
   if (loading) {

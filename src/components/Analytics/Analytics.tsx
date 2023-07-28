@@ -8,9 +8,9 @@ import { HourlyIncidents } from './HourlyIncidents';
 import { MonthlyIncidentsResponders } from './MonthlyIncidentsResponder';
 import { DailyIncidentsResponders } from './DailyIncidentsResponder';
 import { DailyIncidents } from './DailyIncidents';
-import { configApiRef, useApi } from '@backstage/core-plugin-api';
+import { ApiRef, configApiRef, useApi } from '@backstage/core-plugin-api';
 import moment from 'moment';
-import { opsgenieApiRef } from '../../api';
+import { Opsgenie, opsgenieApiRef } from '../../api';
 import { useAsync } from 'react-use';
 import { Progress } from '@backstage/core-components';
 import { Alert } from '@material-ui/lab';
@@ -18,21 +18,22 @@ import { Context, DEFAULT_BUSINESS_HOURS_END, DEFAULT_BUSINESS_HOURS_START } fro
 import { InfoPanel } from '../InfoPanel';
 import { WeeklyImpactResponders } from './WeeklyImpactResponder';
 
-export const Analytics = () => {
+export const Analytics = ({refs = [opsgenieApiRef] }: {refs?: ApiRef<Opsgenie>[] }) => {
   const configApi = useApi(configApiRef);
-  const opsgenieApi = useApi(opsgenieApiRef);
+  const apis = refs.map(useApi);
 
   const from = moment().subtract(1, 'year').startOf('quarter');
   const to = moment();
-
+  
   const { value: data, loading, error } = useAsync(async () => {
-    return Promise.all([
-      opsgenieApi.getIncidents({
-        limit: 100,
-        query: `createdAt < ${to.valueOf()} AND createdAt > ${from.valueOf()}`
-      }),
-      opsgenieApi.getTeams(),
-    ])
+    const incidents = await Promise.all(apis.map(api => api.getIncidents({
+      limit: 100,
+      query: `createdAt < ${to.valueOf()} AND createdAt > ${from.valueOf()}`
+    })));
+
+    const teams = await Promise.all(apis.map(api => api.getTeams()));
+    return { incidents: incidents.flat(), teams: teams.flat()}
+
   });
 
   if (loading) {
@@ -44,8 +45,8 @@ export const Analytics = () => {
   const context: Context = {
     from: from,
     to: to,
-    incidents: data![0].filter(incident => moment(incident.impactStartDate).isAfter(from)),
-    teams: data![1],
+    incidents: data?.incidents.filter(incident => moment(incident.impactStartDate).isAfter(from)) || [],
+    teams: data?.teams || [],
   };
 
   const businessHours = {

@@ -1,13 +1,13 @@
 import React from 'react';
 import { Link, Table, TableColumn } from '@backstage/core-components';
-import { useApi } from '@backstage/core-plugin-api';
+import { ApiRef, useApi } from '@backstage/core-plugin-api';
 import { Chip } from '@material-ui/core';
 import { PriorityChip } from '../UI/PriorityChip';
-import { opsgenieApiRef } from '../../api';
+import { Opsgenie, opsgenieApiRef } from '../../api';
 import { Incident } from '../../types';
 
-export const IncidentsTable = ({ incidents }: { incidents: Incident[] }) => {
-  const opsgenieApi = useApi(opsgenieApiRef);
+export const IncidentsTable = ({ incidents, ref = opsgenieApiRef }: { ref?: ApiRef<Opsgenie>, incidents: Incident[] }) => {
+  const opsgenieApi = useApi(ref);
   const smallColumnStyle = {
     width: '5%',
     maxWidth: '5%',

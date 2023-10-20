@@ -97,7 +97,7 @@ export const OnCallForScheduleCard = ({ schedule, responderFormatter }: { schedu
       <Tooltip title={schedule.enabled ? 'Enabled' : 'Disabled'}>
         <div>{schedule.enabled ? <StatusOK /> : <StatusAborted />}</div>
       </Tooltip>
-      {schedule.ownerTeam.name}
+      {schedule.ownerTeam ? schedule.ownerTeam.name : ""}
     </div>
   );
 

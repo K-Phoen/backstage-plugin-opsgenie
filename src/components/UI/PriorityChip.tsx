@@ -1,61 +1,69 @@
-import React from 'react';
-import { Chip, Tooltip, withStyles } from '@material-ui/core';
+import React from "react";
+import { Chip, Tooltip, withStyles } from "@material-ui/core";
 
 const P5Chip = withStyles({
   root: {
-    backgroundColor: '#00857A',
-    color: 'white',
-  }
+    backgroundColor: "#00857A",
+    color: "white",
+  },
 })(Chip);
 const P4Chip = withStyles({
   root: {
-    backgroundColor: '#36b37e',
-    color: 'white',
-  }
+    backgroundColor: "#36b37e",
+    color: "white",
+  },
 })(Chip);
 const P3Chip = withStyles({
   root: {
-    backgroundColor: '#ffab00',
-    color: 'white',
-  }
+    backgroundColor: "#ffab00",
+    color: "white",
+  },
 })(Chip);
 const P2Chip = withStyles({
   root: {
-    backgroundColor: '#ff7452',
-    color: 'white',
-  }
+    backgroundColor: "#ff7452",
+    color: "white",
+  },
 })(Chip);
 const P1Chip = withStyles({
   root: {
-    backgroundColor: '#bf2600',
-    color: 'white',
-  }
+    backgroundColor: "#bf2600",
+    color: "white",
+  },
 })(Chip);
 
 const priorityLabels = {
-  'P5': 'Informational',
-  'P4': 'Low',
-  'P3': 'Moderate',
-  'P2': 'High',
-  'P1': 'Critical',
+  P5: "Informational",
+  P4: "Low",
+  P3: "Moderate",
+  P2: "High",
+  P1: "Critical",
 } as Record<string, string>;
 
 export const PriorityChip = ({ priority }: { priority: string }) => {
   let chip = <></>;
   switch (priority) {
-    case 'P5':
+    case "P5":
+      /* @ts-expect-error Server Component */
       chip = <P5Chip label={priority} size="small" />;
       break;
-    case 'P4':
+    case "P4":
+      /* @ts-expect-error Server Component */
       chip = <P4Chip label={priority} size="small" />;
       break;
-    case 'P3':
+    case "P3":
+      /* @ts-expect-error Server Component */
+
       chip = <P3Chip label={priority} size="small" />;
       break;
-    case 'P2':
+    case "P2":
+      /* @ts-expect-error Server Component */
+
       chip = <P2Chip label={priority} size="small" />;
       break;
-    case 'P1':
+    case "P1":
+      /* @ts-expect-error Server Component */
+
       chip = <P1Chip label={priority} size="small" />;
       break;
     default:
@@ -66,5 +74,5 @@ export const PriorityChip = ({ priority }: { priority: string }) => {
     <Tooltip title={priorityLabels[priority]}>
       <div>{chip}</div>
     </Tooltip>
-  )
+  );
 };

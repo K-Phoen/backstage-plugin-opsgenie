@@ -81,23 +81,40 @@ export const OnCallForScheduleList = ({ schedule, responderFormatter }: OnCallFo
           <ListItemIcon>
             <PersonIcon />
           </ListItemIcon>
-
+          
           <ListItemText primary={titleFormatter(responder, schedule)} />
         </ListItem>
       ))}
 
-      {value!.length === 0 && <ListItem><ListItemText primary={`⚠️ No one on-call for schedule "${schedule.name}".`} /></ListItem>}
+      {value!.length === 0 && (
+        <ListItem>
+          <ListItemText primary="⚠️ No one on-call for this schedule." />
+        </ListItem>
+      )}
     </List>
   );
 };
 
 export const OnCallForScheduleCard = ({ schedule, responderFormatter }: { schedule: Schedule, responderFormatter?: ResponderTitleFormatter }) => {
   const title = (
-    <div style={{ display: "flex" }}>
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'flex', flexDirection: 'row' }}>
       <Tooltip title={schedule.enabled ? 'Enabled' : 'Disabled'}>
         <div>{schedule.enabled ? <StatusOK /> : <StatusAborted />}</div>
       </Tooltip>
       {schedule.ownerTeam.name}
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          fontSize: '70%',
+          marginLeft: '1.25rem',
+        }}
+      >
+        {schedule.name}
+      </div>
     </div>
   );
 

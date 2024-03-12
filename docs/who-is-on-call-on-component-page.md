@@ -8,7 +8,7 @@ Adding the `EntityOpsgenieOnCallListCard` component to an entity's page will dis
 import {
   EntityOpsgenieOnCallListCard,
   isOpsgenieOnCallListAvailable
-} from '@k-phoen/backstage-plugin-opsgenie';
+} from '@essent/backstage-plugin-opsgenie';
 
 // ...
 

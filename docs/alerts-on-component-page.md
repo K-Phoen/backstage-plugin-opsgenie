@@ -8,7 +8,7 @@ Adding the `EntityOpsgenieAlertsCard` component to an entity's page will display
 import {
   EntityOpsgenieAlertsCard,
   isOpsgenieAvailable
-} from '@k-phoen/backstage-plugin-opsgenie';
+} from '@essent/backstage-plugin-opsgenie';
 
 // ...
 

@@ -5,11 +5,11 @@ metadata:
   description: |
     Backstage plugin to integrate Opsgenie.
   annotations:
-    github.com/project-slug: K-Phoen/backstage-plugin-opsgenie
+    github.com/project-slug: Essent/backstage-plugin-opsgenie
   tags:
     - plugin
     - oss
 spec:
   type: library
-  owner: user:K-Phoen
+  owner: user:Essent
   lifecycle: experimental

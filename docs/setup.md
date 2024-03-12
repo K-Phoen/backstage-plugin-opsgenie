@@ -3,7 +3,7 @@
 Add the plugin to your frontend app:
 
 ```bash
-cd packages/app && yarn add @k-phoen/backstage-plugin-opsgenie
+cd packages/app && yarn add @essent/backstage-plugin-opsgenie
 ```
 
 Configure the plugin in `app-config.yaml`. The proxy endpoint described below will allow the frontend
@@ -28,7 +28,7 @@ Expose the Opsgenie page:
 
 ```ts
 // packages/app/src/App.tsx
-import { OpsgeniePage } from '@k-phoen/backstage-plugin-opsgenie';
+import { OpsgeniePage } from '@essent/backstage-plugin-opsgenie';
 
 // ...
 
